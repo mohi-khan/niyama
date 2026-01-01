@@ -50,11 +50,11 @@ const ItemView = () => {
   return (
     <div className="space-y-4">
       {/* Show data arrival time */}
-      {arrivalTime !== null && (
+      {/* {arrivalTime !== null && (
         <p className="text-sm text-gray-500">
           Items arrived in: {arrivalTime.toFixed(2)} ms
         </p>
-      )}
+      )} */}
 
       {/* Combobox */}
       <div className="space-y-2">
