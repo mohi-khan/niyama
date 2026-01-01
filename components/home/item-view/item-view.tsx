@@ -11,10 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const ItemView = () => {
-  const { data: items } = useGetItems()
+  const [arrivalTime, setArrivalTime] = useState<number | null>(null)
+  const [startTime, setStartTime] = useState<number>(performance.now())
+  const { data: items, isLoading } = useGetItems()
+
   const [selectedName, setSelectedName] = useState<string>('')
 
   const formatLabel = (item: {
@@ -30,8 +33,29 @@ const ItemView = () => {
 
   const { data: stockLevelItem } = useGetTransactionReport(selectedName)
 
+  // Measure data arrival time
+  useEffect(() => {
+    if (items) {
+      const endTime = performance.now()
+      setArrivalTime(endTime - startTime)
+    }
+  }, [items, startTime])
+
+  // Reset timer on new fetch
+  useEffect(() => {
+    setStartTime(performance.now())
+    setArrivalTime(null)
+  }, [isLoading])
+
   return (
     <div className="space-y-4">
+      {/* Show data arrival time */}
+      {arrivalTime !== null && (
+        <p className="text-sm text-gray-500">
+          Items arrived in: {arrivalTime.toFixed(2)} ms
+        </p>
+      )}
+
       {/* Combobox */}
       <div className="space-y-2">
         <Label htmlFor="name">Item*</Label>
@@ -60,7 +84,7 @@ const ItemView = () => {
         />
       </div>
 
-      {/* Stock Level Table (Always Visible) */}
+      {/* Stock Level Table */}
       <div className="border rounded-md">
         <Table>
           <TableHeader>
@@ -75,10 +99,7 @@ const ItemView = () => {
             {/* No item selected */}
             {!selectedName && (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center text-muted-foreground"
-                >
+                <TableCell colSpan={3} className="text-center text-muted-foreground">
                   Please select an item to show stock level item.
                 </TableCell>
               </TableRow>
@@ -87,10 +108,7 @@ const ItemView = () => {
             {/* Item selected but no stock */}
             {selectedName && stockLevelItem?.data?.message?.length === 0 && (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center text-muted-foreground"
-                >
+                <TableCell colSpan={3} className="text-center text-muted-foreground">
                   No stock available for this item.
                 </TableCell>
               </TableRow>
@@ -104,9 +122,7 @@ const ItemView = () => {
                 <TableRow key={index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.warehouse}</TableCell>
-                  <TableCell className="text-right">
-                    {item.actual_qty}
-                  </TableCell>
+                  <TableCell className="text-right">{item.actual_qty}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
