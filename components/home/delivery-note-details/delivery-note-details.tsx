@@ -1,8 +1,8 @@
 'use client'
 
-import { useGetDeliveryNoteDetails } from '@/hooks/use-api'
+import { useGetDeliveryNoteDetails, useDeliverNote } from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -13,14 +13,38 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const DeliveryNoteDetails = () => {
   const name = useParams().name
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+
   const { data: deliveryNoteDetails, isLoading } = useGetDeliveryNoteDetails(
     name as string
   )
 
   const noteData = deliveryNoteDetails?.data?.data
+
+  // Initialize the deliver mutation
+  const deliverMutation = useDeliverNote({
+    onClose: () => {
+      setIsAlertOpen(false)
+      // Optional: Add any post-delivery actions
+    },
+    reset: () => {
+      // Optional: Add any reset logic
+    },
+  })
 
   if (isLoading) {
     return (
@@ -41,13 +65,54 @@ const DeliveryNoteDetails = () => {
     )
   }
 
+  // Check if delivery note is already submitted (docstatus === 1)
+  const isDelivered = noteData.docstatus === 1
+
+  const handleDeliver = () => {
+    if (!isDelivered && noteData.name) {
+      deliverMutation.mutate({ name: noteData.name })
+    }
+  }
+
   return (
     <div className="space-y-6 p-6">
       {/* Header Section */}
-      <div>
-        <h1 className="text-3xl font-bold">{noteData.name}</h1>
-        <p className="text-muted-foreground">{noteData.title}</p>
+      <div className="flex justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">{noteData.name}</h1>
+          <p className="text-muted-foreground">{noteData.title}</p>
+        </div>
+        <Button
+          variant={'outline'}
+          onClick={() => setIsAlertOpen(true)}
+          disabled={isDelivered || deliverMutation.isPending}
+        >
+          {deliverMutation.isPending
+            ? 'Delivering...'
+            : isDelivered
+              ? 'Delivered'
+              : 'Deliver'}
+        </Button>
       </div>
+
+      {/* Alert Dialog */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent className='bg-white'>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Delivery</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to deliver this note? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeliver}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
