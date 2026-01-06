@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { custom, z } from 'zod'
 
 export const SignInRequestSchema = z.object({
   usr: z.string().min(1),
@@ -63,3 +63,25 @@ export const StockLevelItemSchema = z.object({
   ),
 })
 export type getStockLevelItemType = z.infer<typeof StockLevelItemSchema>
+
+export const UserPermissionSchema = z.object({
+  data: z.array(
+    z.object({
+      for_value: z.string(),
+    })
+  ),
+})
+export type UserWarehousePermissionType = z.infer<typeof UserPermissionSchema>
+
+export const DeliveryNotesSchema = z.object({
+  data: z.array(
+    z.object({
+      name: z.string(),
+      customer: z.string(),
+      posting_date: z.string(),
+      grand_total: z.number(),
+      shipping_address: z.string(),
+    })
+  ),
+})
+export type DeliveryNotesType = z.infer<typeof DeliveryNotesSchema>
