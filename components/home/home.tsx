@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
-import { signIn } from '@/utils/api'
+import { getUserDetAssWarehouse, getUserPermission, signIn } from '@/utils/api'
 import { toast } from '@/hooks/use-toast'
 
 export default function SignIn() {
@@ -53,6 +53,30 @@ export default function SignIn() {
           title: 'Success',
           description: 'you are signined in',
         })
+        const response = await getUserDetAssWarehouse()
+        console.log('🚀 ~ handleSubmit ~ response:', response)
+
+        let apiKey = response.data.message
+        const usrPermissions = await getUserPermission(usr)
+        console.log(
+          '🚀 ~ handleSubmit ~ usrPermissions(warehouse):',
+          usrPermissions?.data?.data
+        )
+
+        let warehouse = usrPermissions?.data?.data
+        if (!warehouse) {
+          alert(
+            'Login successful, but no Warehouse is assigned to your user account in ERPNext.'
+          )
+          toast({
+            title: 'Error',
+            variant: 'destructive',
+            description: 'Login successful, but no Warehouse is assigned to your user account in ERPNext.',
+          })
+          return
+        }
+        localStorage.setItem('apiKey', apiKey)
+        localStorage.setItem('warehouse', JSON.stringify(warehouse))
       }
     } catch (err) {
       console.error('Login error:', err)
