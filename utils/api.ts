@@ -1,5 +1,6 @@
 import { fetchApi } from '@/utils/http'
 import {
+  DeliveryNoteDetailsType,
   DeliveryNotesType,
   GetItemType,
   getStockLevelItemType,
@@ -53,10 +54,20 @@ export async function getDeliveryNote(warehouse: string[] | null) {
       : []),
   ])
   console.log("🚀 ~ getDeliveryNote ~ filters:", filters)
-  const fields = JSON.stringify(["name"])
+  const fields = JSON.stringify(["name", "customer", "posting_date", "grand_total"])
 
   return fetchApi<DeliveryNotesType>({
     url: `api/resource/Delivery Note?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getDeliveryNoteDetails(name: string) {
+  return fetchApi<DeliveryNoteDetailsType>({
+    url: `api/resource/Delivery Note/${name}`,
     method: 'GET',
     headers: {
       Authorization: API_KEY_AND_SECRET || '',

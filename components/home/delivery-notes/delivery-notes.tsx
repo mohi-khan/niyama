@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import Link from 'next/link'
 
 const DeliveryNotes = () => {
   useInitializeUserPermission()
@@ -25,6 +26,7 @@ const DeliveryNotes = () => {
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
   const { data: deliveryNotes } = useGetDeliveryNote(warehouse)
+  console.log('🚀 ~ DeliveryNotes ~ deliveryNotes:', deliveryNotes)
 
   const deliveryNoteList = deliveryNotes?.data?.data ?? []
 
@@ -35,7 +37,10 @@ const DeliveryNotes = () => {
           <TableHeader>
             <TableRow>
               <TableHead className="w-16">SL</TableHead>
-              <TableHead className='text-right'>Delivery Note Name</TableHead>
+              <TableHead>Delivery Note Name</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Posting Date</TableHead>
+              <TableHead className="text-right">Grand Total</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -53,10 +58,19 @@ const DeliveryNotes = () => {
             )}
 
             {/* Data rows */}
-            {deliveryNoteList.map((item: any, index: number) => (
-              <TableRow key={item.name ?? index}>
+            {deliveryNoteList.map((deliveryNote: any, index: number) => (
+              <TableRow key={deliveryNote.name ?? index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell className='text-right'>{item.name}</TableCell>
+                <TableCell className='font-semibold'>
+                  <Link href={`/delivery-note-details/${deliveryNote.name}`}>
+                    {deliveryNote.name}
+                  </Link>
+                </TableCell>
+                <TableCell>{deliveryNote.customer}</TableCell>
+                <TableCell>{deliveryNote.posting_date}</TableCell>
+                <TableCell className="text-right">
+                  {deliveryNote.grand_total}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

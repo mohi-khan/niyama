@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getDeliveryNote, getItems, getStockLevelItem } from '@/utils/api'
+import { getDeliveryNote, getDeliveryNoteDetails, getItems, getStockLevelItem } from '@/utils/api'
 
 //item
 export const useGetItems = () => {
@@ -17,6 +17,16 @@ export const useGetTransactionReport = (name: string) => {
     queryKey: ['items', name],
     queryFn: () => {
       return getStockLevelItem(name)
+    },
+    select: (data) => data,
+  })
+}
+
+export const useGetDeliveryNoteDetails = (name: string) => {
+  return useQuery({
+    queryKey: ['deliveryNoteDetails', name],
+    queryFn: () => {
+      return getDeliveryNoteDetails(name)
     },
     select: (data) => data,
   })
