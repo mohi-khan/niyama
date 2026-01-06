@@ -33,8 +33,8 @@ const DeliveryNotes = () => {
   return (
     <div className="space-y-4">
       <div className="border rounded-md">
-        <Table>
-          <TableHeader>
+        <Table className='shadow-md'>
+          <TableHeader className='bg-slate-200'>
             <TableRow>
               <TableHead className="w-16">SL</TableHead>
               <TableHead>Delivery Note Name</TableHead>

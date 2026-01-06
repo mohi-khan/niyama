@@ -53,6 +53,7 @@ export default function SignIn() {
           title: 'Success',
           description: 'you are signined in',
         })
+        localStorage.setItem('user', usr)
         const response = await getUserDetAssWarehouse()
         console.log('🚀 ~ handleSubmit ~ response:', response)
 
@@ -110,7 +111,7 @@ export default function SignIn() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="usr">usr</Label>
+              <Label htmlFor="usr">Username/Email</Label>
               <Input
                 id="usr"
                 type="text"
@@ -121,12 +122,12 @@ export default function SignIn() {
               />
             </div>
             <div className="space-y-2 pb-3">
-              <Label htmlFor="pwd">pwd</Label>
+              <Label htmlFor="pwd">Password</Label>
               <div className="relative">
                 <Input
                   id="pwd"
                   className="border border-black"
-                  type={showpwd ? 'text' : 'pwd'}
+                  type={showpwd ? 'text' : 'password'}
                   value={pwd}
                   onChange={(e) => setpwd(e.target.value)}
                   required
@@ -153,8 +154,9 @@ export default function SignIn() {
             )}
             <Button
               type="submit"
-              className="w-full bg-yellow-400 mt-10 hover:bg-yellow-500 text-black"
+              className="w-full bg-black hover:bg-black text-white hover:text-white"
               disabled={isLoading}
+              variant={'outline'}
             >
               <LockIcon className="mr-2 h-4 w-4" />
               {isLoading ? 'Signing In...' : 'Sign In'}
