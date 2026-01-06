@@ -46,19 +46,37 @@ export async function getUserPermission(username: string) {
 }
 
 export async function getDeliveryNote(warehouse: string[] | null) {
-  console.log("🚀 ~ getDeliveryNote ~ warehouse:", warehouse)
+  console.log('🚀 ~ getDeliveryNote ~ warehouse:', warehouse)
   const filters = JSON.stringify([
     ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['set_warehouse', 'in', warehouse]]
       : []),
   ])
-  console.log("🚀 ~ getDeliveryNote ~ filters:", filters)
-  const fields = JSON.stringify(["name", "customer", "posting_date", "grand_total"])
+  console.log('🚀 ~ getDeliveryNote ~ filters:', filters)
+  const fields = JSON.stringify([
+    'name',
+    'customer',
+    'posting_date',
+    'grand_total',
+  ])
 
   return fetchApi<DeliveryNotesType>({
     url: `api/resource/Delivery Note?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
     method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function deliverNote(name: string) {
+  return fetchApi({
+    url: `api/resource/Delivery Note/${name}`,
+    method: 'PUT',
+    body: {
+      docstatus: 1, // 1 = Submit in ERPNext (not boolean true)
+    },
     headers: {
       Authorization: API_KEY_AND_SECRET || '',
     },

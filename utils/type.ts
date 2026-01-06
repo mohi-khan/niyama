@@ -110,6 +110,7 @@ export const DeliveryNoteDetailsSchema = z.object({
     contact_person: z.string(),
     contact_display: z.string(),
     contact_email: z.string(),
+    docstatus: z.number(),
 
     items: z.array(
       z.object({
