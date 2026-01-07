@@ -51,65 +51,99 @@ export const useDeliverNote = ({
   const mutation = useMutation({
     mutationFn: async ({ name }: { name: string }) => {
       const response = await deliverNote(name)
-      return response
+
+      console.log('🚀 ~ useDeliverNote ~ response:', response)
+
+      /**
+       * 🔴 API-level error
+       */
+      if (response?.error) {
+        throw {
+          response: {
+            status: response.error.status,
+            data: response.error.details,
+            message: response.error.message,
+          },
+        }
+      }
+
+      /**
+       * ✅ Extract actual Delivery Note document
+       */
+      const doc = (response?.data as any)?.data
+
+      const docstatus = doc?.docstatus
+
+      console.log('✅ docstatus:', docstatus)
+
+      /**
+       * 🔴 Logical failure (not actually submitted)
+       */
+      if (docstatus !== 1) {
+        throw {
+          response: {
+            status: 417,
+            data: {
+              message: 'Delivery note was not submitted.',
+            },
+          },
+        }
+      }
+
+      return doc
     },
+
     onSuccess: () => {
-      console.log('hit');
       toast({
         title: 'Success!',
         description: 'Note delivered successfully.',
       })
-      queryClient.invalidateQueries({ queryKey: ['deliveryNoteDetails'] })
+
+      queryClient.invalidateQueries({
+        queryKey: ['deliveryNoteDetails'],
+      })
 
       reset()
       onClose()
     },
-    onError: (error: any) => {
-      console.error('Error delivering note:', error)
 
+    onError: (error: any) => {
       let errorMessage = 'Failed to deliver note.'
 
-      // Handle Frappe-specific error format
-      console.log('hit2');
-      if (error.response) {
-        const status = error.response.status
-        const errorData = error.response.data
+      const errorData = error?.response?.data
+      const status = error?.response?.status
 
-        // Handle 417 validation errors from Frappe
-        if (status === 417 && errorData._server_messages) {
-          try {
-            const messages = JSON.parse(errorData._server_messages || '[]')
-            const cleanMessages = messages.map((msg: string) => {
-              const parsedMsg = JSON.parse(msg)
-              // Remove HTML tags from Frappe messages
-              return parsedMsg.message.replace(/<[^>]*>/g, '')
+      // ✅ Frappe validation messages
+      if (status === 417 && errorData?._server_messages) {
+        try {
+          const messages = JSON.parse(errorData._server_messages)
+
+          errorMessage = messages
+            .map((msg: string) => {
+              const parsed = JSON.parse(msg)
+              return parsed.message.replace(/<[^>]*>/g, '')
             })
-            errorMessage =
-              cleanMessages.join('\n') || 'Validation error occurred.'
-          } catch (parseError) {
-            console.error('Error parsing server messages:', parseError)
-            errorMessage = 'Validation error occurred.'
-          }
-        }
-        // Handle other Frappe errors
-        else if (errorData.message) {
-          errorMessage = errorData.message
-        } else if (errorData.exception) {
-          errorMessage = errorData.exception
-        }
-        // Handle network errors
-        else if (status >= 500) {
-          errorMessage = 'Server error. Please try again later.'
-        } else if (status === 403) {
-          errorMessage =
-            'You do not have permission to submit this delivery note.'
-        } else if (status === 404) {
-          errorMessage = 'Delivery note not found.'
+            .join('\n')
+        } catch {
+          errorMessage = 'Validation error occurred.'
         }
       }
-      // Handle network or unknown errors
-      else if (error.message) {
-        errorMessage = error.message
+      // ✅ Frappe exception
+      else if (errorData?.exception) {
+        errorMessage = errorData.exception.replace(/<[^>]*>/g, '')
+      }
+      // ✅ Custom message
+      else if (error?.response?.message) {
+        errorMessage = error.response.message
+      }
+      // ✅ Permission
+      else if (status === 403) {
+        errorMessage =
+          'You do not have permission to submit this delivery note.'
+      }
+      // ✅ Server error
+      else if (status >= 500) {
+        errorMessage = 'Server error. Please try again later.'
       }
 
       toast({

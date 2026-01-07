@@ -10,7 +10,7 @@ import React, { useRef, useState } from 'react'
 const Navbar = () => {
   useInitializeUser()
   const [userData] = useAtom(userDataAtom)
-  console.log('🚀 ~ Navbar ~ userData:', userData)
+  
   const pathname = usePathname()
   const router = useRouter()
 
@@ -57,10 +57,10 @@ const Navbar = () => {
       </div>
       <div className="flex space-x-2 items-center">
         <div
-          className="relative flex items-center pl-3 custom-shadow border border-slate-200 rounded-full"
+          className="relative flex items-center md:pl-3 custom-shadow border border-slate-200 rounded-full"
           ref={profileRef}
         >
-          <p className='pr-2'>{userData}</p>
+          <p className="pr-2 hidden md:block">{userData}</p>
           <button
             className="flex items-center justify-center  text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-500 ease-in-out"
             id="user-menu"
@@ -71,13 +71,20 @@ const Navbar = () => {
             <User2 className="h-7 w-7 text-gray-600 border border-gray-600 p-1 rounded-full" />
           </button>
           {isProfileOpen && (
-            <div className="origin-top-right absolute right-0 mt-24 w-48 rounded-md shadow-lg">
+            <div className="origin-top-right absolute right-0 md:mt-24 mt-36 w-48 rounded-md shadow-lg">
               <div
                 className="py-1 rounded-md bg-white shadow-xs"
                 role="menu"
                 aria-orientation="vertical"
                 aria-labelledby="user-menu"
               >
+                <div className="px-4 py-3 border-b border-slate-200 md:hidden block">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium text-gray-700">
+                      {userData}
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={handleSignOut}
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
