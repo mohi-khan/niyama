@@ -32,6 +32,7 @@ const DeliveryNoteDetails = () => {
   const { data: deliveryNoteDetails, isLoading } = useGetDeliveryNoteDetails(
     name as string
   )
+  console.log("🚀 ~ DeliveryNoteDetails ~ deliveryNoteDetails:", deliveryNoteDetails)
 
   const noteData = deliveryNoteDetails?.data?.data
 

@@ -35,3 +35,13 @@ body {
     display: none !important;
   }
 }
+
+.custom-shadow {
+  background: #f8fafc; /* slightly lighter than slate-100 */
+
+  box-shadow:
+    8px 8px 12px rgba(133, 146, 165, 0.35),  /* bottom-right shadow */
+   -8px -8px 12px white; /* top-left highlight */
+
+  transition: all 0.25s ease;
+}

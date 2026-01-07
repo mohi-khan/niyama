@@ -57,7 +57,7 @@ const ItemView = () => {
       )} */}
 
       {/* Combobox */}
-      <div className="space-y-2">
+      <div className="space-y-2 mb-10">
         <Label htmlFor="name">Item*</Label>
 
         <CustomCombobox
@@ -86,8 +86,8 @@ const ItemView = () => {
 
       {/* Stock Level Table */}
       <div className="border rounded-md">
-        <Table>
-          <TableHeader>
+        <Table className='shadow-md'>
+          <TableHeader className='bg-slate-200'>
             <TableRow>
               <TableHead className="w-16">SL</TableHead>
               <TableHead>Warehouse</TableHead>
