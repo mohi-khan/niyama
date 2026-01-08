@@ -111,6 +111,7 @@ export const DeliveryNoteDetailsSchema = z.object({
     contact_display: z.string(),
     contact_email: z.string(),
     docstatus: z.number(),
+    custom_special_instruction: z.string(),
 
     items: z.array(
       z.object({
@@ -144,3 +145,16 @@ export const DeliveryNoteDetailsSchema = z.object({
   }),
 })
 export type DeliveryNoteDetailsType = z.infer<typeof DeliveryNoteDetailsSchema>
+
+export const GoodsReceivedSchema = z.object({
+  data: z.array(
+    z.object({
+      name: z.string(),
+      customer: z.string(),
+      posting_date: z.string(),
+      grand_total: z.number(),
+      shipping_address: z.string(),
+    })
+  ),
+})
+export type GoodsReceivedType = z.infer<typeof GoodsReceivedSchema>

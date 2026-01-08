@@ -26,7 +26,7 @@ const Navbar = () => {
   }
 
   const linkBaseClass =
-    'border rounded-md p-1 w-32 text-center transition-colors'
+    'border rounded-md p-1 w-48 text-center transition-colors'
 
   const activeClass = 'bg-white border border-slate-200 custom-shadow'
   const inactiveClass = 'border-slate-300 hover:bg-slate-50 bg-slate-50'
@@ -36,7 +36,7 @@ const Navbar = () => {
       <div className="flex justify-start items-center space-x-4 ">
         <Link
           href="/item-view"
-          className={`w-3${linkBaseClass} ${
+          className={`w-4${linkBaseClass} ${
             pathname === '/item-view' ? activeClass : inactiveClass
           }`}
         >
@@ -53,6 +53,15 @@ const Navbar = () => {
           }`}
         >
           Delivery Notes
+        </Link>
+
+        <Link
+          href="/goods-received"
+          className={`w-4${linkBaseClass} ${
+            pathname === '/goods-received' ? activeClass : inactiveClass
+          }`}
+        >
+          Goods Received
         </Link>
       </div>
       <div className="flex space-x-2 items-center">

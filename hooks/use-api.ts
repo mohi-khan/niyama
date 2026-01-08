@@ -3,6 +3,7 @@ import {
   deliverNote,
   getDeliveryNote,
   getDeliveryNoteDetails,
+  getGoodsReceived,
   getItems,
   getStockLevelItem,
 } from '@/utils/api'
@@ -163,6 +164,16 @@ export const useGetDeliveryNote = (warehouse: string[] | null) => {
     queryKey: ['deliveryNotes', warehouse],
     queryFn: () => {
       return getDeliveryNote(warehouse)
+    },
+    select: (data) => data,
+  })
+}
+
+export const useGetGoodsReceived = () => {
+  return useQuery({
+    queryKey: ['goodsReceived'],
+    queryFn: () => {
+      return getGoodsReceived()
     },
     select: (data) => data,
   })

@@ -33,8 +33,8 @@ const DeliveryNotes = () => {
   return (
     <div className="space-y-4">
       <div className="border rounded-md">
-        <Table className='shadow-md'>
-          <TableHeader className='bg-slate-200'>
+        <Table className="shadow-md">
+          <TableHeader className="bg-slate-200">
             <TableRow>
               <TableHead className="w-16">SL</TableHead>
               <TableHead>Delivery Note Name</TableHead>
@@ -49,7 +49,7 @@ const DeliveryNotes = () => {
             {deliveryNoteList.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={2}
+                  colSpan={5}
                   className="text-center text-muted-foreground"
                 >
                   No delivery notes found.
@@ -61,7 +61,7 @@ const DeliveryNotes = () => {
             {deliveryNoteList.map((deliveryNote: any, index: number) => (
               <TableRow key={deliveryNote.name ?? index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell className='font-semibold'>
+                <TableCell className="font-semibold">
                   <Link href={`/delivery-note-details/${deliveryNote.name}`}>
                     {deliveryNote.name}
                   </Link>

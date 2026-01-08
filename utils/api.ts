@@ -4,6 +4,7 @@ import {
   DeliveryNotesType,
   GetItemType,
   getStockLevelItemType,
+  GoodsReceivedType,
   SignInRequest,
   SignInResponse,
   SignInResponseSchema,
@@ -106,6 +107,16 @@ export async function getItems() {
 export async function getStockLevelItem(name: string) {
   return fetchApi<getStockLevelItemType>({
     url: `api/method/getStockLevelItem?item_code=${name}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsReceived() {
+  return fetchApi<GoodsReceivedType>({
+    url: `api/resource/Stock Entry`,
     method: 'GET',
     headers: {
       Authorization: API_KEY_AND_SECRET || '',

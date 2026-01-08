@@ -2,7 +2,8 @@
 
 import { useGetDeliveryNoteDetails, useDeliverNote } from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
+import { useReactToPrint } from 'react-to-print'
 import {
   Table,
   TableBody,
@@ -24,15 +25,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Printer } from 'lucide-react'
 
 const DeliveryNoteDetails = () => {
   const name = useParams().name
   const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const printRef = useRef<HTMLDivElement>(null)
 
   const { data: deliveryNoteDetails, isLoading } = useGetDeliveryNoteDetails(
     name as string
   )
-  console.log("🚀 ~ DeliveryNoteDetails ~ deliveryNoteDetails:", deliveryNoteDetails)
+  console.log(
+    '🚀 ~ DeliveryNoteDetails ~ deliveryNoteDetails:',
+    deliveryNoteDetails
+  )
 
   const noteData = deliveryNoteDetails?.data?.data
 
@@ -40,11 +46,13 @@ const DeliveryNoteDetails = () => {
   const deliverMutation = useDeliverNote({
     onClose: () => {
       setIsAlertOpen(false)
-      // Optional: Add any post-delivery actions
     },
-    reset: () => {
-      // Optional: Add any reset logic
-    },
+    reset: () => {},
+  })
+
+  // Print handler
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
   })
 
   if (isLoading) {
@@ -98,7 +106,7 @@ const DeliveryNoteDetails = () => {
 
       {/* Alert Dialog */}
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent className='bg-white'>
+        <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Delivery</AlertDialogTitle>
             <AlertDialogDescription>
@@ -240,7 +248,15 @@ const DeliveryNoteDetails = () => {
 
       {/* Items Table */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Items</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Items</h2>
+          <div>
+            <Printer
+              className="border p-2 w-10 h-10 rounded-md cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={() => handlePrint()}
+            />
+          </div>
+        </div>
         <div className="border rounded-md">
           <Table>
             <TableHeader>
@@ -286,6 +302,127 @@ const DeliveryNoteDetails = () => {
               ))}
             </TableBody>
           </Table>
+        </div>
+      </div>
+
+      {/* Printable Delivery Note (Hidden from view) */}
+      <div className="hidden">
+        <div ref={printRef} className="p-8 bg-white">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold border-b border-gray-300 py-2">
+              Delivery Note
+            </h2>
+          </div>
+
+          {/* Customer and Date Info */}
+          <div className="flex justify-between mb-6 text-sm">
+            <div>
+              <p className="mb-1">
+                <span className="font-semibold">Customer:</span>{' '}
+                {noteData.customer_name}
+              </p>
+              <p className="text-gray-600">
+                {noteData.contact_display} {noteData.contact_mobile}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="mb-1">
+                <span className="font-semibold">Date:</span>{' '}
+                {noteData.posting_date}
+              </p>
+              <p className="mb-1">
+                <span className="font-semibold">DC No:</span> {noteData.name}
+              </p>
+              <p>
+                <span className="font-semibold">Warehouse:</span>{' '}
+                {noteData.set_warehouse}
+              </p>
+            </div>
+          </div>
+
+          {/* Table */}
+          <table className="w-full border-collapse border border-gray-300 mb-4">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">
+                  SL
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left text-sm font-semibold">
+                  Item - Description
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
+                  CTN
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
+                  CTN/OUM
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
+                  Qty
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {noteData.items.map((item, index) => (
+                <tr key={item.name ?? index}>
+                  <td className="border border-gray-300 px-4 py-2 text-sm text-center">
+                    {index + 1}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm">
+                    <span className="font-semibold">{item.item_code}</span> -{' '}
+                    {item.item_name}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm text-center">
+                    {item.custom_carton_qty || 0}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm text-center">
+                    {item.qty / item.custom_carton_qty || 'N/A'}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-sm text-center">
+                    {item.qty} pcs
+                  </td>
+                </tr>
+              ))}
+              <tr className="bg-gray-50">
+                <td className="border border-gray-300 px-4 py-2"></td>
+                <td className="border border-gray-300 px-4 py-2 text-sm text-right font-semibold">
+                  Total
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
+                  {noteData.custom_total_cartoon_quantity}
+                </td>
+                <td className="border border-gray-300 px-4 py-2"></td>
+                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
+                  {noteData.total_qty}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Note */}
+          <p className="text-sm mb-8">
+            <span className="font-semibold">Note:</span>{' '}
+            {noteData.custom_special_instruction || 'N/A'}
+          </p>
+
+          {/* Signature Section */}
+          <div className="flex justify-between pt-12">
+            <div className="text-center">
+              <div className="border-t border-gray-400 pt-2 w-40">
+                <p className="text-sm font-semibold">Prepared By</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="border-t border-gray-400 pt-2 w-40">
+                <p className="text-sm font-semibold">Checked By</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="border-t border-gray-400 pt-2 w-40">
+                <p className="text-sm font-semibold">Authorized Signature</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
