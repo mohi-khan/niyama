@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/table'
 import Link from 'next/link'
 
-const GoodsReceived = () => {
+const GoodsIssue = () => {
   useInitializeUserPermission()
 
   const [warehousePermission] = useAtom(warehousePermissionAtom)
@@ -28,7 +28,7 @@ const GoodsReceived = () => {
   const { data: goodsReceived } = useGetGoodsReceived(warehouse)
   console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
 
-  const goodsReceivedList = goodsReceived?.data?.data ?? []
+  const goodsIssueList = goodsReceived?.data?.data ?? []
 
   return (
     <div className="space-y-4">
@@ -45,7 +45,7 @@ const GoodsReceived = () => {
 
           <TableBody>
             {/* No data */}
-            {goodsReceivedList.length === 0 && (
+            {goodsIssueList.length === 0 && (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -57,7 +57,7 @@ const GoodsReceived = () => {
             )}
 
             {/* Data rows */}
-            {goodsReceivedList.map((goodsReceived, index) => (
+            {goodsIssueList.map((goodsReceived, index) => (
               <TableRow key={goodsReceived.name ?? index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="font-semibold">
@@ -78,4 +78,4 @@ const GoodsReceived = () => {
   )
 }
 
-export default GoodsReceived
+export default GoodsIssue

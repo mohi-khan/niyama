@@ -121,7 +121,7 @@ export async function getGoodsReceived(warehouse: string[] | null) {
   const filters = JSON.stringify([
     ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
-      ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
+      ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
       : []),
   ])
 
@@ -141,6 +141,39 @@ export async function getGoodsReceived(warehouse: string[] | null) {
 }
 
 export async function getGoodsReceivedDetails(name: string) {
+  return fetchApi<GoodsReceivedDetailsType>({
+    url: `api/resource/Stock Entry/${name}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsIssue(warehouse: string[] | null) {
+  const filters = JSON.stringify([
+    ['docstatus', '=', 0],
+    ...(warehouse && warehouse.length > 0
+      ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
+      : []),
+  ])
+
+  console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
+
+  const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
+
+  return fetchApi<GoodsReceivedType>({
+    url: `api/resource/Stock Entry?filters=${encodeURIComponent(
+      filters
+    )}&fields=${encodeURIComponent(fields)}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsIssueDetails(name: string) {
   return fetchApi<GoodsReceivedDetailsType>({
     url: `api/resource/Stock Entry/${name}`,
     method: 'GET',

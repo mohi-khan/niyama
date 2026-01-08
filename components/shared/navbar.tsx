@@ -56,6 +56,18 @@ const Navbar = () => {
         </Link>
 
         <Link
+          href="/goods-issue"
+          className={`${linkBaseClass} ${
+            pathname === '/goods-issue' ||
+            pathname.startsWith('/goods-issue-details')
+              ? activeClass
+              : inactiveClass
+          }`}
+        >
+          Goods Issue
+        </Link>
+
+        <Link
           href="/goods-received"
           className={`${linkBaseClass} ${
             pathname === '/goods-received' ||

@@ -3,6 +3,8 @@ import {
   deliverNote,
   getDeliveryNote,
   getDeliveryNoteDetails,
+  getGoodsIssue,
+  getGoodsIssueDetails,
   getGoodsReceived,
   getGoodsReceivedDetails,
   getItems,
@@ -166,6 +168,27 @@ export const useGetDeliveryNote = (warehouse: string[] | null) => {
     queryKey: ['deliveryNotes', warehouse],
     queryFn: () => {
       return getDeliveryNote(warehouse)
+    },
+    select: (data) => data,
+  })
+}
+
+export const useGetGoodsIssue = (warehouse: string[] | null) => {
+  console.log('🚀 ~ useGetDeliveryNote ~ warehouse:', warehouse)
+  return useQuery({
+    queryKey: ['goodsIssue', warehouse],
+    queryFn: () => {
+      return getGoodsIssue(warehouse)
+    },
+    select: (data) => data,
+  })
+}
+
+export const useGetGoodsIssueDetails = (name: string) => {
+  return useQuery({
+    queryKey: ['goodsIssue', name],
+    queryFn: () => {
+      return getGoodsIssueDetails(name)
     },
     select: (data) => data,
   })
