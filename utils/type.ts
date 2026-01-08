@@ -111,6 +111,7 @@ export const DeliveryNoteDetailsSchema = z.object({
     contact_display: z.string(),
     contact_email: z.string(),
     docstatus: z.number(),
+    custom_special_instruction: z.string(),
 
     items: z.array(
       z.object({
@@ -144,3 +145,49 @@ export const DeliveryNoteDetailsSchema = z.object({
   }),
 })
 export type DeliveryNoteDetailsType = z.infer<typeof DeliveryNoteDetailsSchema>
+
+export const GoodsReceivedSchema = z.object({
+  data: z.array(
+    z.object({
+      name: z.string(),
+      posting_date: z.string(),
+      stock_entry_type: z.string(),
+    })
+  ),
+})
+export type GoodsReceivedType = z.infer<typeof GoodsReceivedSchema>
+
+export const GoodsReceivedDetailsSchema = z.object({
+  data: z.object({
+    name: z.string(),
+    owner: z.string(),
+
+    stock_entry_type: z.string(),
+    purpose: z.string(),
+    company: z.string(),
+
+    posting_date: z.string(),
+    posting_time: z.string(),
+
+    doctype: z.string(),
+    docstatus: z.number(),
+
+    items: z.array(
+      z.object({
+        name: z.string(),
+        owner: z.string(),
+        
+        s_warehouse: z.string(),
+        t_warehouse: z.string(),
+        custom_actual_target_warehouse: z.string(),
+
+        item_code: z.string(),
+        item_name: z.string(),
+
+        qty: z.number(),
+        description: z.string(),
+      })
+    ),
+  }),
+})
+export type GoodsReceivedDetailsType = z.infer<typeof GoodsReceivedDetailsSchema>

@@ -4,6 +4,8 @@ import {
   DeliveryNotesType,
   GetItemType,
   getStockLevelItemType,
+  GoodsReceivedDetailsType,
+  GoodsReceivedType,
   SignInRequest,
   SignInResponse,
   SignInResponseSchema,
@@ -75,7 +77,7 @@ export async function deliverNote(name: string) {
     url: `api/resource/Delivery Note/${name}`,
     method: 'PUT',
     body: {
-      docstatus: 1, // 1 = Submit in ERPNext (not boolean true)
+      docstatus: 1,
     },
     headers: {
       Authorization: API_KEY_AND_SECRET || '',
@@ -107,6 +109,87 @@ export async function getStockLevelItem(name: string) {
   return fetchApi<getStockLevelItemType>({
     url: `api/method/getStockLevelItem?item_code=${name}`,
     method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsReceived(warehouse: string[] | null) {
+  console.log('🚀 ~ getGoodsReceived ~ warehouse:', warehouse)
+
+  const filters = JSON.stringify([
+    ['docstatus', '=', 0],
+    ...(warehouse && warehouse.length > 0
+      ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
+      : []),
+  ])
+
+  console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
+
+  const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
+
+  return fetchApi<GoodsReceivedType>({
+    url: `api/resource/Stock Entry?filters=${encodeURIComponent(
+      filters
+    )}&fields=${encodeURIComponent(fields)}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsReceivedDetails(name: string) {
+  return fetchApi<GoodsReceivedDetailsType>({
+    url: `api/resource/Stock Entry/${name}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsIssue(warehouse: string[] | null) {
+  const filters = JSON.stringify([
+    ['docstatus', '=', 0],
+    ...(warehouse && warehouse.length > 0
+      ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
+      : []),
+  ])
+
+  console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
+
+  const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
+
+  return fetchApi<GoodsReceivedType>({
+    url: `api/resource/Stock Entry?filters=${encodeURIComponent(
+      filters
+    )}&fields=${encodeURIComponent(fields)}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function getGoodsIssueDetails(name: string) {
+  return fetchApi<GoodsReceivedDetailsType>({
+    url: `api/resource/Stock Entry/${name}`,
+    method: 'GET',
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function issueGoods(name: string) {
+  return fetchApi({
+    url: `api/resource/Stock Entry/${name}`,
+    method: 'PUT',
+    body: {
+      docstatus: 1,
+    },
     headers: {
       Authorization: API_KEY_AND_SECRET || '',
     },

@@ -163,14 +163,14 @@ export default function SignIn() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
+        {/* <CardFooter className="flex flex-col space-y-2">
           <Link
             href="/forgot-pwd"
             className="text-sm text-center text-primary hover:underline"
           >
             Forgot your pwd?
           </Link>
-        </CardFooter>
+        </CardFooter> */}
       </Card>
     </div>
   )

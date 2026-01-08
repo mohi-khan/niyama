@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetDeliveryNote } from '@/hooks/use-api'
+import { useGetGoodsReceived } from '@/hooks/use-api'
 import {
   useInitializeUserPermission,
   warehousePermissionAtom,
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/table'
 import Link from 'next/link'
 
-const DeliveryNotes = () => {
+const GoodsIssue = () => {
   useInitializeUserPermission()
 
   const [warehousePermission] = useAtom(warehousePermissionAtom)
@@ -25,10 +25,10 @@ const DeliveryNotes = () => {
   const warehouse =
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
-  const { data: deliveryNotes } = useGetDeliveryNote(warehouse)
-  console.log('🚀 ~ DeliveryNotes ~ deliveryNotes:', deliveryNotes)
+  const { data: goodsReceived } = useGetGoodsReceived(warehouse)
+  console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
 
-  const deliveryNoteList = deliveryNotes?.data?.data ?? []
+  const goodsIssueList = goodsReceived?.data?.data ?? []
 
   return (
     <div className="space-y-4">
@@ -37,39 +37,37 @@ const DeliveryNotes = () => {
           <TableHeader className="bg-slate-200">
             <TableRow>
               <TableHead className="w-16">SL</TableHead>
-              <TableHead>Delivery Note Name</TableHead>
-              <TableHead>Customer</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Posting Date</TableHead>
-              <TableHead className="text-right">Grand Total</TableHead>
+              <TableHead className="text-right">Stock Entry Type</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {/* No data */}
-            {deliveryNoteList.length === 0 && (
+            {goodsIssueList.length === 0 && (
               <TableRow>
                 <TableCell
                   colSpan={5}
                   className="text-center text-muted-foreground"
                 >
-                  No delivery notes found.
+                  No goods received found.
                 </TableCell>
               </TableRow>
             )}
 
             {/* Data rows */}
-            {deliveryNoteList.map((deliveryNote: any, index: number) => (
-              <TableRow key={deliveryNote.name ?? index}>
+            {goodsIssueList.map((goodsReceived, index) => (
+              <TableRow key={goodsReceived.name ?? index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="font-semibold">
-                  <Link href={`/delivery-note-details/${deliveryNote.name}`}>
-                    {deliveryNote.name}
+                  <Link href={`/goods-received-details/${goodsReceived.name}`}>
+                    {goodsReceived.name}
                   </Link>
                 </TableCell>
-                <TableCell>{deliveryNote.customer}</TableCell>
-                <TableCell>{deliveryNote.posting_date}</TableCell>
+                <TableCell>{goodsReceived.posting_date}</TableCell>
                 <TableCell className="text-right">
-                  {deliveryNote.grand_total}
+                  {goodsReceived.stock_entry_type}
                 </TableCell>
               </TableRow>
             ))}
@@ -80,4 +78,4 @@ const DeliveryNotes = () => {
   )
 }
 
-export default DeliveryNotes
+export default GoodsIssue

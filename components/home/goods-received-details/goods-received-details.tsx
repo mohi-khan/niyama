@@ -1,8 +1,8 @@
 'use client'
 
-import { useGetDeliveryNoteDetails, useDeliverNote } from '@/hooks/use-api'
+import { useGetGoodsReceivedDetails, useIssueGoods } from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
-import React, { useState, useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
 import {
   Table,
@@ -27,23 +27,19 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Printer } from 'lucide-react'
 
-const DeliveryNoteDetails = () => {
+const GoodsReceivedDetails = () => {
   const name = useParams().name
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
 
-  const { data: deliveryNoteDetails, isLoading } = useGetDeliveryNoteDetails(
+  const { data: goodsReceived, isLoading } = useGetGoodsReceivedDetails(
     name as string
   )
-  console.log(
-    '🚀 ~ DeliveryNoteDetails ~ deliveryNoteDetails:',
-    deliveryNoteDetails
-  )
 
-  const noteData = deliveryNoteDetails?.data?.data
+  const goodData = goodsReceived?.data?.data
 
-  // Initialize the deliver mutation
-  const deliverMutation = useDeliverNote({
+  // Initialize the issue mutation
+  const issueMutation = useIssueGoods({
     onClose: () => {
       setIsAlertOpen(false)
     },
@@ -64,22 +60,22 @@ const DeliveryNoteDetails = () => {
     )
   }
 
-  if (!noteData) {
+  if (!goodData) {
     return (
       <div className="p-6">
         <p className="text-center text-muted-foreground">
-          No delivery note details found.
+          No goods received details found.
         </p>
       </div>
     )
   }
 
-  // Check if delivery note is already submitted (docstatus === 1)
-  const isDelivered = noteData.docstatus === 1
+  // Check if goods are already issued (docstatus === 1)
+  const isIssued = goodData.docstatus === 1
 
-  const handleDeliver = () => {
-    if (!isDelivered && noteData.name) {
-      deliverMutation.mutate({ name: noteData.name })
+  const handleIssue = () => {
+    if (!isIssued && goodData.name) {
+      issueMutation.mutate({ name: goodData.name })
     }
   }
 
@@ -88,19 +84,19 @@ const DeliveryNoteDetails = () => {
       {/* Header Section */}
       <div className="flex justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{noteData.name}</h1>
-          <p className="text-muted-foreground">{noteData.title}</p>
+          <h1 className="text-3xl font-bold">{goodData.name}</h1>
+          <p className="text-muted-foreground">{goodData.stock_entry_type}</p>
         </div>
         <Button
           variant={'outline'}
           onClick={() => setIsAlertOpen(true)}
-          disabled={isDelivered || deliverMutation.isPending}
+          disabled={isIssued || issueMutation.isPending}
         >
-          {deliverMutation.isPending
-            ? 'Delivering...'
-            : isDelivered
-              ? 'Delivered'
-              : 'Deliver'}
+          {issueMutation.isPending
+            ? 'Issuing...'
+            : isIssued
+              ? 'Issued'
+              : 'Issue'}
         </Button>
       </div>
 
@@ -108,17 +104,15 @@ const DeliveryNoteDetails = () => {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Delivery</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Issue</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to deliver this note? This action cannot be
+              Are you sure you want to issue these goods? This action cannot be
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeliver}>
-              Confirm
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleIssue}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -127,120 +121,62 @@ const DeliveryNoteDetails = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
-              Customer Information
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Entry Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
-              <p className="text-sm text-muted-foreground">Customer</p>
-              <p className="font-semibold">{noteData.customer}</p>
+              <p className="text-sm text-muted-foreground">Stock Entry Type</p>
+              <p className="font-semibold">{goodData.stock_entry_type}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Customer Name</p>
-              <p className="font-semibold">{noteData.customer_name}</p>
+              <p className="text-sm text-muted-foreground">Purpose</p>
+              <p className="font-semibold">{goodData.purpose}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Contact Mobile</p>
-              <p className="font-semibold">
-                {noteData.contact_mobile || 'N/A'}
-              </p>
+              <p className="text-sm text-muted-foreground">Document Type</p>
+              <p className="font-semibold">{goodData.doctype}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
-              Contact Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Contact Person</p>
-              <p className="font-semibold">
-                {noteData.contact_person || 'N/A'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Contact Display</p>
-              <p className="font-semibold">
-                {noteData.contact_display || 'N/A'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Contact Email</p>
-              <p className="font-semibold">{noteData.contact_email || 'N/A'}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Posting Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
               <p className="text-sm text-muted-foreground">Posting Date</p>
-              <p className="font-semibold">{noteData.posting_date}</p>
+              <p className="font-semibold">{goodData.posting_date}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Posting Time</p>
-              <p className="font-semibold">{noteData.posting_time}</p>
+              <p className="font-semibold">{goodData.posting_time}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Owner</p>
-              <p className="font-semibold">{noteData.owner}</p>
+              <p className="font-semibold">{goodData.owner}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
-              Company & Warehouse
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Company Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
               <p className="text-sm text-muted-foreground">Company</p>
-              <p className="font-semibold">{noteData.company}</p>
+              <p className="font-semibold">{goodData.company}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Warehouse</p>
-              <p className="font-semibold">{noteData.set_warehouse}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Cost Center</p>
-              <p className="font-semibold">{noteData.cost_center || 'N/A'}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
-              Totals
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Quantity</p>
-              <p className="font-semibold">{noteData.total_qty}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Net Weight</p>
-              <p className="font-semibold">{noteData.total_net_weight}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Total Carton Quantity
-              </p>
-              <p className="font-semibold">
-                {noteData.custom_total_cartoon_quantity}
-              </p>
+              <p className="text-sm text-muted-foreground">Total Items</p>
+              <p className="font-semibold">{goodData.items.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -264,21 +200,20 @@ const DeliveryNoteDetails = () => {
                 <TableHead className="w-16">SL</TableHead>
                 <TableHead>Item Code</TableHead>
                 <TableHead>Item Name</TableHead>
-                <TableHead>Item Group</TableHead>
+                <TableHead>Source Warehouse</TableHead>
+                <TableHead>Target Warehouse</TableHead>
+                <TableHead>Actual Target Warehouse</TableHead>
                 <TableHead>Qty</TableHead>
-                <TableHead>Carton Qty</TableHead>
-                <TableHead>Stock Qty</TableHead>
-                <TableHead>Warehouse</TableHead>
                 <TableHead>Description</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {/* No data */}
-              {noteData.items.length === 0 && (
+              {goodData.items.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={9}
+                    colSpan={8}
                     className="text-center text-muted-foreground"
                   >
                     No items found.
@@ -287,16 +222,17 @@ const DeliveryNoteDetails = () => {
               )}
 
               {/* Data rows */}
-              {noteData.items.map((item, index) => (
+              {goodData.items.map((item, index) => (
                 <TableRow key={item.name ?? index}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{item.item_code}</TableCell>
                   <TableCell>{item.item_name}</TableCell>
-                  <TableCell>{item.item_group}</TableCell>
+                  <TableCell>{item.s_warehouse || 'N/A'}</TableCell>
+                  <TableCell>{item.t_warehouse || 'N/A'}</TableCell>
+                  <TableCell>
+                    {item.custom_actual_target_warehouse || 'N/A'}
+                  </TableCell>
                   <TableCell>{item.qty}</TableCell>
-                  <TableCell>{item.custom_carton_qty}</TableCell>
-                  <TableCell>{item.stock_qty}</TableCell>
-                  <TableCell>{item.warehouse}</TableCell>
                   <TableCell>{item.description || 'N/A'}</TableCell>
                 </TableRow>
               ))}
@@ -305,38 +241,43 @@ const DeliveryNoteDetails = () => {
         </div>
       </div>
 
-      {/* Printable Delivery Note (Hidden from view) */}
+      {/* Printable Goods Received Note (Hidden from view) */}
       <div className="hidden">
         <div ref={printRef} className="p-8 bg-white">
           {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 py-2">
-              Delivery Note
+              Goods Received Note
             </h2>
           </div>
 
-          {/* Customer and Date Info */}
+          {/* Entry and Date Info */}
           <div className="flex justify-between mb-6 text-sm">
             <div>
               <p className="mb-1">
-                <span className="font-semibold">Customer:</span>{' '}
-                {noteData.customer_name}
+                <span className="font-semibold">Entry Type:</span>{' '}
+                {goodData.stock_entry_type}
+              </p>
+              <p className="mb-1">
+                <span className="font-semibold">Purpose:</span>{' '}
+                {goodData.purpose}
               </p>
               <p className="text-gray-600">
-                {noteData.contact_display} {noteData.contact_mobile}
+                <span className="font-semibold">Company:</span>{' '}
+                {goodData.company}
               </p>
             </div>
             <div className="text-right">
               <p className="mb-1">
                 <span className="font-semibold">Date:</span>{' '}
-                {noteData.posting_date}
+                {goodData.posting_date}
               </p>
               <p className="mb-1">
-                <span className="font-semibold">DC No:</span> {noteData.name}
+                <span className="font-semibold">Time:</span>{' '}
+                {goodData.posting_time}
               </p>
               <p>
-                <span className="font-semibold">Warehouse:</span>{' '}
-                {noteData.set_warehouse}
+                <span className="font-semibold">Entry No:</span> {goodData.name}
               </p>
             </div>
           </div>
@@ -352,10 +293,10 @@ const DeliveryNoteDetails = () => {
                   Item - Description
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
-                  CTN
+                  Source Warehouse
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
-                  CTN/OUM
+                  Target Warehouse
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
                   Qty
@@ -363,7 +304,7 @@ const DeliveryNoteDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {noteData.items.map((item, index) => (
+              {goodData.items.map((item, index) => (
                 <tr key={item.name ?? index}>
                   <td className="border border-gray-300 px-4 py-2 text-sm text-center">
                     {index + 1}
@@ -373,37 +314,33 @@ const DeliveryNoteDetails = () => {
                     {item.item_name}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm text-center">
-                    {item.custom_carton_qty || 0}
+                    {item.s_warehouse || 'N/A'}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm text-center">
-                    {item.qty / item.custom_carton_qty || 'N/A'}
+                    {item.custom_actual_target_warehouse ||
+                      item.t_warehouse ||
+                      'N/A'}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-sm text-center">
-                    {item.qty} pcs
+                    {item.qty}
                   </td>
                 </tr>
               ))}
               <tr className="bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2"></td>
                 <td className="border border-gray-300 px-4 py-2 text-sm text-right font-semibold">
-                  Total
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
-                  {noteData.custom_total_cartoon_quantity}
+                  Total Items
                 </td>
                 <td className="border border-gray-300 px-4 py-2"></td>
                 <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
-                  {noteData.total_qty}
+                  {goodData.items.length}
+                </td>
+                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
+                  {goodData.items.reduce((sum, item) => sum + item.qty, 0)}
                 </td>
               </tr>
             </tbody>
           </table>
-
-          {/* Note */}
-          <p className="text-sm mb-8">
-            <span className="font-semibold">Note:</span>{' '}
-            {noteData.custom_special_instruction || 'N/A'}
-          </p>
 
           {/* Signature Section */}
           <div className="flex justify-between pt-12">
@@ -429,4 +366,4 @@ const DeliveryNoteDetails = () => {
   )
 }
 
-export default DeliveryNoteDetails
+export default GoodsReceivedDetails
