@@ -28,7 +28,12 @@ const GoodsReceived = () => {
   const { data: goodsReceived } = useGetGoodsReceived(warehouse)
   console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
 
-  const goodsReceivedList = goodsReceived?.data?.data ?? []
+  const materialReceivedData =
+  goodsReceived?.data?.data?.filter(
+    (item) => item.stock_entry_type === 'Material Receipt'
+  )
+
+  const goodsReceivedList = materialReceivedData ?? []
 
   return (
     <div className="space-y-4">
