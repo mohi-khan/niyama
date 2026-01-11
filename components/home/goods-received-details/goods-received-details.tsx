@@ -1,6 +1,10 @@
 'use client'
 
-import { useGetGoodsReceivedDetails, useIssueGoods } from '@/hooks/use-api'
+import {
+  useGetGoodsReceivedDetails,
+  useIssueGoods,
+  useReceiveGoods,
+} from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
 import React, { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
@@ -38,8 +42,8 @@ const GoodsReceivedDetails = () => {
 
   const goodData = goodsReceived?.data?.data
 
-  // Initialize the issue mutation
-  const issueMutation = useIssueGoods({
+  // Initialize the receive mutation
+  const issueMutation = useReceiveGoods({
     onClose: () => {
       setIsAlertOpen(false)
     },
@@ -93,10 +97,10 @@ const GoodsReceivedDetails = () => {
           disabled={isIssued || issueMutation.isPending}
         >
           {issueMutation.isPending
-            ? 'Issuing...'
+            ? 'Receiving...'
             : isIssued
-              ? 'Issued'
-              : 'Issue'}
+              ? 'Received'
+              : 'Receive'}
         </Button>
       </div>
 
@@ -104,10 +108,10 @@ const GoodsReceivedDetails = () => {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Issue</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Receive</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to issue these goods? This action cannot be
-              undone.
+              Are you sure you want to receive these goods? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -332,9 +336,7 @@ const GoodsReceivedDetails = () => {
                   Total Items
                 </td>
                 <td className="border border-gray-300 px-4 py-2"></td>
-                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
-                  {goodData.items.length}
-                </td>
+                <td className="border border-gray-300 px-4 py-2"></td>
                 <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
                   {goodData.items.reduce((sum, item) => sum + item.qty, 0)}
                 </td>

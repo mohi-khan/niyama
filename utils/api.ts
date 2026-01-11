@@ -158,7 +158,7 @@ export async function getGoodsIssue(warehouse: string[] | null) {
       : []),
   ])
 
-  console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
+  console.log('🚀 ~ getGoodsIssue ~ filters:', filters)
 
   const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
 
@@ -184,6 +184,19 @@ export async function getGoodsIssueDetails(name: string) {
 }
 
 export async function issueGoods(name: string) {
+  return fetchApi({
+    url: `api/resource/Stock Entry/${name}`,
+    method: 'PUT',
+    body: {
+      docstatus: 1,
+    },
+    headers: {
+      Authorization: API_KEY_AND_SECRET || '',
+    },
+  })
+}
+
+export async function receiveGoods(name: string) {
   return fetchApi({
     url: `api/resource/Stock Entry/${name}`,
     method: 'PUT',

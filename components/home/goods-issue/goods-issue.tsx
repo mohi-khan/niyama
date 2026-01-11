@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetGoodsReceived } from '@/hooks/use-api'
+import { useGetGoodsIssue, useGetGoodsReceived } from '@/hooks/use-api'
 import {
   useInitializeUserPermission,
   warehousePermissionAtom,
@@ -25,10 +25,10 @@ const GoodsIssue = () => {
   const warehouse =
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
-  const { data: goodsReceived } = useGetGoodsReceived(warehouse)
-  console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
+  const { data: goodsIssue } = useGetGoodsIssue(warehouse)
+  console.log('🚀 ~ GoodsIssue ~ goodsIssue:', goodsIssue?.data?.data)
 
-  const goodsIssueList = goodsReceived?.data?.data ?? []
+  const goodsIssueList = goodsIssue?.data?.data ?? []
 
   return (
     <div className="space-y-4">
@@ -57,17 +57,17 @@ const GoodsIssue = () => {
             )}
 
             {/* Data rows */}
-            {goodsIssueList.map((goodsReceived, index) => (
-              <TableRow key={goodsReceived.name ?? index}>
+            {goodsIssueList.map((goodsIssue, index) => (
+              <TableRow key={goodsIssue.name ?? index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="font-semibold">
-                  <Link href={`/goods-received-details/${goodsReceived.name}`}>
-                    {goodsReceived.name}
+                  <Link href={`/goods-issue-details/${goodsIssue.name}`}>
+                    {goodsIssue.name}
                   </Link>
                 </TableCell>
-                <TableCell>{goodsReceived.posting_date}</TableCell>
+                <TableCell>{goodsIssue.posting_date}</TableCell>
                 <TableCell className="text-right">
-                  {goodsReceived.stock_entry_type}
+                  {goodsIssue.stock_entry_type}
                 </TableCell>
               </TableRow>
             ))}
