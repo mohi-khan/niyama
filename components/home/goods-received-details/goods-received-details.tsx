@@ -1,6 +1,10 @@
 'use client'
 
-import { useGetGoodsReceivedDetails, useIssueGoods, useReceiveGoods } from '@/hooks/use-api'
+import {
+  useGetGoodsReceivedDetails,
+  useIssueGoods,
+  useReceiveGoods,
+} from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
 import React, { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
@@ -106,8 +110,8 @@ const GoodsReceivedDetails = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Receive</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to receive these goods? This action cannot be
-              undone.
+              Are you sure you want to receive these goods? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -332,9 +336,7 @@ const GoodsReceivedDetails = () => {
                   Total Items
                 </td>
                 <td className="border border-gray-300 px-4 py-2"></td>
-                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
-                  {goodData.items.length}
-                </td>
+                <td className="border border-gray-300 px-4 py-2"></td>
                 <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
                   {goodData.items.reduce((sum, item) => sum + item.qty, 0)}
                 </td>

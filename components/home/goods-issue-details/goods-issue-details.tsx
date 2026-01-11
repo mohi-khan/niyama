@@ -1,6 +1,10 @@
 'use client'
 
-import { useGetGoodsIssueDetails, useGetGoodsReceivedDetails, useIssueGoods } from '@/hooks/use-api'
+import {
+  useGetGoodsIssueDetails,
+  useGetGoodsReceivedDetails,
+  useIssueGoods,
+} from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
 import React, { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
@@ -247,7 +251,7 @@ const GoodsIssueDetails = () => {
           {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 py-2">
-              Goods Received Note
+              Goods Issue Note
             </h2>
           </div>
 
@@ -332,9 +336,7 @@ const GoodsIssueDetails = () => {
                   Total Items
                 </td>
                 <td className="border border-gray-300 px-4 py-2"></td>
-                <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
-                  {goodData.items.length}
-                </td>
+                <td className="border border-gray-300 px-4 py-2"></td>
                 <td className="border border-gray-300 px-4 py-2 text-sm text-center font-semibold">
                   {goodData.items.reduce((sum, item) => sum + item.qty, 0)}
                 </td>
