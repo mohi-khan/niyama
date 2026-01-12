@@ -30,7 +30,7 @@ const GoodsReceived = () => {
 
   const materialReceivedData =
   goodsReceived?.data?.data?.filter(
-    (item) => item.stock_entry_type === 'Material Receipt'
+    (item) => item.stock_entry_type === 'Material Transfer'
   )
 
   const goodsReceivedList = materialReceivedData ?? []

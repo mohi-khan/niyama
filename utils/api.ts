@@ -123,6 +123,7 @@ export async function getGoodsReceived(warehouse: string[] | null) {
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
       : []),
+      ['add_to_transit' ,'=',0]
   ])
 
   console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
@@ -132,7 +133,7 @@ export async function getGoodsReceived(warehouse: string[] | null) {
   return fetchApi<GoodsReceivedType>({
     url: `api/resource/Stock Entry?filters=${encodeURIComponent(
       filters
-    )}&fields=${encodeURIComponent(fields)}`,
+    )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
       Authorization: API_KEY_AND_SECRET || '',
@@ -155,7 +156,7 @@ export async function getGoodsIssue(warehouse: string[] | null) {
     ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
-      : []),
+      : [])
   ])
 
   console.log('🚀 ~ getGoodsIssue ~ filters:', filters)
@@ -165,7 +166,7 @@ export async function getGoodsIssue(warehouse: string[] | null) {
   return fetchApi<GoodsReceivedType>({
     url: `api/resource/Stock Entry?filters=${encodeURIComponent(
       filters
-    )}&fields=${encodeURIComponent(fields)}`,
+    )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
       Authorization: API_KEY_AND_SECRET || '',
