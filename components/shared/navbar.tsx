@@ -1,6 +1,8 @@
 'use client'
 
+import { useGetDeliveryNote, useGetGoodsIssue, useGetGoodsReceived, useGetItems } from '@/hooks/use-api'
 import { useInitializeUser, userDataAtom } from '@/utils/user'
+import { warehousePermissionAtom } from '@/utils/user-permission'
 import { useAtom } from 'jotai'
 import { User2 } from 'lucide-react'
 import Link from 'next/link'
@@ -10,7 +12,21 @@ import React, { useRef, useState } from 'react'
 const Navbar = () => {
   useInitializeUser()
   const [userData] = useAtom(userDataAtom)
-  
+  const [warehousePermission] = useAtom(warehousePermissionAtom)
+
+  const warehouse =
+    (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
+
+  const { data: items } = useGetItems()
+  const { data: deliveryNotes } = useGetDeliveryNote(warehouse)
+  const { data: goodsIssue } = useGetGoodsIssue(warehouse)
+  const { data: goodsReceived } = useGetGoodsReceived(warehouse)
+
+  const materialReceivedData =
+  goodsReceived?.data?.data?.filter(
+    (item) => item.stock_entry_type === 'Material Transfer'
+  )
+
   const pathname = usePathname()
   const router = useRouter()
 
@@ -52,7 +68,7 @@ const Navbar = () => {
               : inactiveClass
           }`}
         >
-          Delivery Notes
+          Delivery Notes ({deliveryNotes?.data?.data.length})
         </Link>
 
         <Link
@@ -64,7 +80,7 @@ const Navbar = () => {
               : inactiveClass
           }`}
         >
-          Goods Issue
+          Goods Issue ({goodsIssue?.data?.data.length})
         </Link>
 
         <Link
@@ -76,7 +92,7 @@ const Navbar = () => {
               : inactiveClass
           }`}
         >
-          Goods Received
+          Goods Received ({materialReceivedData?.length})
         </Link>
       </div>
       <div className="flex space-x-2 items-center">
