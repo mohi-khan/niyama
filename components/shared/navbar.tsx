@@ -22,6 +22,11 @@ const Navbar = () => {
   const { data: goodsIssue } = useGetGoodsIssue(warehouse)
   const { data: goodsReceived } = useGetGoodsReceived(warehouse)
 
+  const materialReceivedData =
+  goodsReceived?.data?.data?.filter(
+    (item) => item.stock_entry_type === 'Material Transfer'
+  )
+
   const pathname = usePathname()
   const router = useRouter()
 
@@ -87,7 +92,7 @@ const Navbar = () => {
               : inactiveClass
           }`}
         >
-          Goods Received ({goodsReceived?.data?.data.length})
+          Goods Received ({materialReceivedData?.length})
         </Link>
       </div>
       <div className="flex space-x-2 items-center">
