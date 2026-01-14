@@ -134,7 +134,7 @@ const Navbar = () => {
       <div className="p-5 rounded-md border m-5 bg-slate-200 shadow-md flex justify-between items-center">
         {/* Mobile Hamburger Menu Button */}
         <button
-          className="md:hidden flex items-center justify-center p-2 rounded-md hover:bg-slate-300 transition-colors"
+          className="md:hidden flex items-center justify-center p-1 rounded-md transition-colors custom-shadow border "
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
         >
