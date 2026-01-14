@@ -84,7 +84,7 @@ const DeliveryNoteDetails = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header Section */}
       <div className="flex justify-between">
         <div>
@@ -257,7 +257,7 @@ const DeliveryNoteDetails = () => {
             />
           </div>
         </div>
-        <div className="border rounded-md">
+        <div className="border rounded-md overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
