@@ -37,7 +37,7 @@ body {
 }
 
 .custom-shadow {
-  background: #f8fafc; /* slightly lighter than slate-100 */
+  background: #f8fafc; 
 
   box-shadow:
     8px 8px 12px rgba(133, 146, 165, 0.35),  /* bottom-right shadow */
