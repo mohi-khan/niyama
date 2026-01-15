@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  useGetGoodsIssueDetails,
-  useGetGoodsReceivedDetails,
-  useIssueGoods,
-} from '@/hooks/use-api'
+import { useGetGoodsIssueDetails, useIssueGoods } from '@/hooks/use-api'
 import { useParams } from 'next/navigation'
 import React, { useRef, useState } from 'react'
 import { useReactToPrint } from 'react-to-print'
@@ -29,7 +25,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Printer } from 'lucide-react'
+import {
+  Printer,
+  ArrowUpFromLine,
+  Calendar,
+  Clock,
+  Building2,
+  Package,
+  FileText,
+  Warehouse,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react'
 
 const GoodsIssueDetails = () => {
   const name = useParams().name
@@ -67,9 +74,12 @@ const GoodsIssueDetails = () => {
   if (!goodData) {
     return (
       <div className="p-6">
-        <p className="text-center text-muted-foreground">
-          No goods received details found.
-        </p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <AlertCircle className="h-16 w-16 text-gray-300 mb-4" />
+          <p className="text-center text-gray-500 font-medium">
+            No goods issue details found.
+          </p>
+        </div>
       </div>
     )
   }
@@ -86,21 +96,52 @@ const GoodsIssueDetails = () => {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{goodData.name}</h1>
-          <p className="text-muted-foreground">{goodData.stock_entry_type}</p>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 pb-4 border-b">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-[#42af4b] rounded-lg">
+            <ArrowUpFromLine className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {goodData.name}
+            </h1>
+            <p className="text-gray-600 mt-1">{goodData.stock_entry_type}</p>
+            <div className="flex items-center gap-2 mt-2">
+              {isIssued ? (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Issued
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                  <Clock className="h-3 w-3" />
+                  Pending
+                </span>
+              )}
+            </div>
+          </div>
         </div>
         <Button
-          variant={'outline'}
+          className={`${isIssued ? 'bg-gray-400' : 'bg-[#42af4b] hover:bg-[#3ba844]'} text-white`}
           onClick={() => setIsAlertOpen(true)}
           disabled={isIssued || issueMutation.isPending}
         >
-          {issueMutation.isPending
-            ? 'Issuing...'
-            : isIssued
-              ? 'Issued'
-              : 'Issue'}
+          {issueMutation.isPending ? (
+            <>
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Issuing...
+            </>
+          ) : isIssued ? (
+            <>
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Issued
+            </>
+          ) : (
+            <>
+              <ArrowUpFromLine className="mr-2 h-4 w-4" />
+              Issue
+            </>
+          )}
         </Button>
       </div>
 
@@ -108,7 +149,10 @@ const GoodsIssueDetails = () => {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Issue</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <ArrowUpFromLine className="h-5 w-5 text-[#42af4b]" />
+              Confirm Issue
+            </AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to issue these goods? This action cannot be
               undone.
@@ -116,128 +160,188 @@ const GoodsIssueDetails = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleIssue}>Confirm</AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleIssue}
+              className="bg-[#42af4b] hover:bg-[#3ba844]"
+            >
+              Confirm Issue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[#42af4b]" />
               Entry Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3 pt-4">
             <div>
-              <p className="text-sm text-muted-foreground">Stock Entry Type</p>
-              <p className="font-semibold">{goodData.stock_entry_type}</p>
+              <p className="text-xs text-gray-500 mb-1">Stock Entry Type</p>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
+                {goodData.stock_entry_type}
+              </span>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Purpose</p>
-              <p className="font-semibold">{goodData.purpose}</p>
+              <p className="text-xs text-gray-500 mb-1">Purpose</p>
+              <p className="font-semibold text-gray-900">{goodData.purpose}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Document Type</p>
-              <p className="font-semibold">{goodData.doctype}</p>
+              <p className="text-xs text-gray-500 mb-1">Document Type</p>
+              <p className="font-semibold text-gray-900">{goodData.doctype}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-[#42af4b]" />
               Posting Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Posting Date</p>
-              <p className="font-semibold">{goodData.posting_date}</p>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Posting Date</p>
+                <p className="font-semibold text-gray-900">
+                  {goodData.posting_date}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Posting Time</p>
+                <p className="font-semibold text-gray-900">
+                  {goodData.posting_time}
+                </p>
+              </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Posting Time</p>
-              <p className="font-semibold">{goodData.posting_time}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Owner</p>
-              <p className="font-semibold">{goodData.owner}</p>
+              <p className="text-xs text-gray-500 mb-1">Owner</p>
+              <p className="font-semibold text-gray-900">{goodData.owner}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-[#42af4b]" />
               Company Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Company</p>
-              <p className="font-semibold">{goodData.company}</p>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Company</p>
+                <p className="font-semibold text-gray-900">
+                  {goodData.company}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Items</p>
-              <p className="font-semibold">{goodData.items.length}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Total Items</p>
+                <p className="font-semibold text-gray-900 text-lg">
+                  {goodData.items.length}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Items Table */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Items</h2>
-          <div>
-            <Printer
-              className="border p-2 w-10 h-10 rounded-md cursor-pointer hover:bg-gray-100 transition-colors"
-              onClick={() => handlePrint()}
-            />
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-[#42af4b]" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Items ({goodData.items.length})
+            </h2>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePrint()}
+            className="flex items-center gap-2 hover:bg-gray-100"
+          >
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
         </div>
-        <div className="border rounded-md overflow-x-auto">
+
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">SL</TableHead>
-                <TableHead>Item Code</TableHead>
-                <TableHead>Item Name</TableHead>
-                <TableHead>Source Warehouse</TableHead>
-                <TableHead>Target Warehouse</TableHead>
-                <TableHead>Actual Target Warehouse</TableHead>
-                <TableHead>Qty</TableHead>
-                <TableHead>Description</TableHead>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="w-16 font-semibold text-gray-900">
+                  SL
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Item Code
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Item Name
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Source
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Actual Target
+                </TableHead>
+                <TableHead className="text-right font-semibold text-gray-900">
+                  Qty
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Description
+                </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {/* No data */}
               {goodData.items.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-muted-foreground"
-                  >
-                    No items found.
+                <TableRow className="hover:bg-gray-50">
+                  <TableCell colSpan={8} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2 text-gray-500">
+                      <Package className="h-12 w-12 text-gray-300" />
+                      <p className="font-medium">No items found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
 
-              {/* Data rows */}
               {goodData.items.map((item, index) => (
-                <TableRow key={item.name ?? index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{item.item_code}</TableCell>
-                  <TableCell>{item.item_name}</TableCell>
-                  <TableCell>{item.s_warehouse || 'N/A'}</TableCell>
-                  <TableCell>{item.t_warehouse || 'N/A'}</TableCell>
-                  <TableCell>
+                <TableRow
+                  key={item.name ?? index}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell className="font-medium text-gray-700">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="font-semibold text-gray-900">
+                    {item.item_code}
+                  </TableCell>
+                  <TableCell className="text-gray-700">
+                    {item.item_name}
+                  </TableCell>
+                  <TableCell className="text-gray-700">
+                    {item.s_warehouse || 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-gray-700">
                     {item.custom_actual_target_warehouse || 'N/A'}
                   </TableCell>
-                  <TableCell>{item.qty}</TableCell>
-                  <TableCell>{item.description || 'N/A'}</TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {item.qty}
+                  </TableCell>
+                  <TableCell className="text-gray-600 text-sm">
+                    {item.description || 'N/A'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -245,17 +349,15 @@ const GoodsIssueDetails = () => {
         </div>
       </div>
 
-      {/* Printable Goods Received Note (Hidden from view) */}
+      {/* Printable Goods Issue Note (Hidden from view) */}
       <div className="hidden">
         <div ref={printRef} className="p-8 bg-white">
-          {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 py-2">
               Goods Issue Note
             </h2>
           </div>
 
-          {/* Entry and Date Info */}
           <div className="flex justify-between mb-6 text-sm">
             <div>
               <p className="mb-1">
@@ -286,7 +388,6 @@ const GoodsIssueDetails = () => {
             </div>
           </div>
 
-          {/* Table */}
           <table className="w-full border-collapse border border-gray-300 mb-4">
             <thead>
               <tr className="bg-gray-50">
@@ -344,7 +445,6 @@ const GoodsIssueDetails = () => {
             </tbody>
           </table>
 
-          {/* Signature Section */}
           <div className="flex justify-between pt-12">
             <div className="text-center">
               <div className="border-t border-gray-400 pt-2 w-40">

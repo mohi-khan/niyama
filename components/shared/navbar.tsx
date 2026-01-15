@@ -9,7 +9,16 @@ import {
 import { useInitializeUser, userDataAtom } from '@/utils/user'
 import { warehousePermissionAtom } from '@/utils/user-permission'
 import { useAtom } from 'jotai'
-import { User2, Menu, X } from 'lucide-react'
+import {
+  User2,
+  Menu,
+  X,
+  Package,
+  Truck,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  LogOut,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useRef, useState, useEffect } from 'react'
@@ -22,7 +31,6 @@ const Navbar = () => {
   const warehouse =
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
-  const { data: items } = useGetItems()
   const { data: deliveryNotes } = useGetDeliveryNote(warehouse)
   const { data: goodsIssue } = useGetGoodsIssue(warehouse)
   const { data: goodsReceived } = useGetGoodsReceived(warehouse)
@@ -77,6 +85,26 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen])
 
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false)
+      }
+    }
+
+    if (isProfileOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isProfileOpen])
+
   // Close mobile menu when route changes with delay
   useEffect(() => {
     if (pathname) {
@@ -88,24 +116,26 @@ const Navbar = () => {
   }, [pathname])
 
   const linkBaseClass =
-    'border rounded-md p-1 w-48 text-center transition-colors relative'
+    'flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 relative'
 
-  const activeClass = 'bg-white border border-slate-200 custom-shadow'
-  const inactiveClass = 'border-slate-300 hover:bg-slate-50 bg-slate-50'
+  const activeClass = 'bg-[#42af4b] text-white shadow-md'
+  const inactiveClass = 'text-gray-700 hover:bg-gray-100'
 
   const mobileLinkBaseClass =
-    'border rounded-md p-3 text-center transition-colors w-full relative'
+    'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 relative'
 
   const navLinks = [
     {
       href: '/item-view',
       label: 'Item View',
+      icon: Package,
       count: null,
       isActive: pathname === '/item-view',
     },
     {
       href: '/delivery-notes',
       label: 'Delivery Notes',
+      icon: Truck,
       count: deliveryNotes?.data?.data.length,
       isActive:
         pathname === '/delivery-notes' ||
@@ -114,6 +144,7 @@ const Navbar = () => {
     {
       href: '/goods-issue',
       label: 'Goods Issue',
+      icon: ArrowUpFromLine,
       count: goodsIssue?.data?.data.length,
       isActive:
         pathname === '/goods-issue' ||
@@ -122,6 +153,7 @@ const Navbar = () => {
     {
       href: '/goods-received',
       label: 'Goods Received',
+      icon: ArrowDownToLine,
       count: materialReceivedData?.length,
       isActive:
         pathname === '/goods-received' ||
@@ -131,77 +163,78 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="p-5 rounded-md border m-5 bg-slate-200 shadow-md flex justify-between items-center">
-        {/* Mobile Hamburger Menu Button */}
-        <button
-          className="md:hidden flex items-center justify-center p-1 rounded-md transition-colors custom-shadow border "
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <Menu className="h-6 w-6 text-gray-700" />
-        </button>
-
-        {/* Desktop Navigation Links */}
-        <div className="hidden md:flex justify-start items-center space-x-4">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${linkBaseClass} ${
-                link.isActive ? activeClass : inactiveClass
-              }`}
-            >
-              {link.label}
-              {link.count !== null && link.count !== undefined && link.count > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                  {link.count}
-                </span>
-              )}
-            </Link>
-          ))}
-        </div>
-
-        {/* User Profile */}
-        <div className="flex space-x-2 items-center">
-          <div
-            className="relative flex items-center md:pl-3 custom-shadow border border-slate-200 rounded-full"
-            ref={profileRef}
-          >
-            <p className="pr-2 hidden md:block">{userData}</p>
+      <div className="bg-white border-b shadow-sm sticky top-0 z-40">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Mobile Hamburger Menu Button */}
             <button
-              className="flex items-center justify-center text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-500 ease-in-out"
-              id="user-menu"
-              aria-label="User menu"
-              aria-haspopup="true"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="md:hidden flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
             >
-              <User2 className="h-7 w-7 text-gray-600 border border-gray-600 p-1 rounded-full" />
+              <Menu className="h-6 w-6 text-gray-700" />
             </button>
-            {isProfileOpen && (
-              <div className="origin-top-right absolute right-0 md:mt-24 mt-36 w-48 rounded-md shadow-lg z-50">
-                <div
-                  className="py-1 rounded-md bg-white shadow-xs"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu"
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center space-x-2">
+              {navLinks.map((link) => {
+                const Icon = link.icon
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`${linkBaseClass} ${
+                      link.isActive ? activeClass : inactiveClass
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{link.label}</span>
+                    {link.count !== null &&
+                      link.count !== undefined &&
+                      link.count > 0 && (
+                        <span className="ml-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                          {link.count}
+                        </span>
+                      )}
+                  </Link>
+                )
+              })}
+            </div>
+
+            {/* User Profile */}
+            <div className="flex items-center">
+              <div className="relative" ref={profileRef}>
+                <button
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  aria-label="User menu"
                 >
-                  <div className="px-4 py-3 border-b border-slate-200 md:hidden block">
-                    <div className="flex items-center space-x-2">
+                  <span className="hidden md:block text-sm font-medium text-gray-700">
+                    {userData}
+                  </span>
+                  <div className="h-8 w-8 rounded-full bg-[#42af4b] flex items-center justify-center">
+                    <User2 className="h-5 w-5 text-white" />
+                  </div>
+                </button>
+
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <div className="px-4 py-3 border-b border-gray-200 md:hidden">
                       <p className="text-sm font-medium text-gray-700">
                         {userData}
                       </p>
                     </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
                   </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Sign out
-                  </button>
-                </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -221,16 +254,16 @@ const Navbar = () => {
         {/* Slide-out Menu */}
         <div
           ref={mobileMenuRef}
-          className={`absolute left-0 top-0 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+          className={`absolute left-0 top-0 h-full w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
             isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
           {/* Menu Header */}
-          <div className="flex justify-between items-center p-5 border-b border-slate-200">
+          <div className="flex justify-between items-center p-5 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-md hover:bg-gray-100 transition-colors"
               aria-label="Close menu"
             >
               <X className="h-6 w-6 text-gray-700" />
@@ -238,24 +271,30 @@ const Navbar = () => {
           </div>
 
           {/* Menu Links */}
-          <nav className="flex flex-col space-y-3 p-5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className={`${mobileLinkBaseClass} ${
-                  link.isActive ? activeClass : inactiveClass
-                }`}
-              >
-                {link.label}
-                {link.count !== null && link.count !== undefined && link.count > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
-                    {link.count}
-                  </span>
-                )}
-              </Link>
-            ))}
+          <nav className="flex flex-col space-y-2 p-4">
+            {navLinks.map((link) => {
+              const Icon = link.icon
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
+                  className={`${mobileLinkBaseClass} ${
+                    link.isActive ? activeClass : inactiveClass
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="flex-1">{link.label}</span>
+                  {link.count !== null &&
+                    link.count !== undefined &&
+                    link.count > 0 && (
+                      <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {link.count}
+                      </span>
+                    )}
+                </Link>
+              )
+            })}
           </nav>
         </div>
       </div>

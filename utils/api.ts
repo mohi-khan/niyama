@@ -11,7 +11,11 @@ import {
   SignInResponseSchema,
   UserWarehousePermissionType,
 } from '@/utils/type'
-const API_KEY_AND_SECRET = process.env.NEXT_PUBLIC_API_KEY_AND_SECRET
+
+const API_KEY_AND_SECRET =
+  process.env.NEXT_PUBLIC_ADMINISTRATOR_API_KEY_AND_SECRET ||
+  process.env.NEXT_PUBLIC_CHKWAREHOUSE_API_KEY_AND_SECRET ||
+  process.env.NEXT_PUBLIC_DHKWAREHOUSE_API_KEY_AND_SECRET
 
 export async function signIn(credentials: SignInRequest) {
   return fetchApi<SignInResponse>({
@@ -123,7 +127,7 @@ export async function getGoodsReceived(warehouse: string[] | null) {
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
       : []),
-      ['add_to_transit' ,'=',0]
+    ['add_to_transit', '=', 0],
   ])
 
   console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
@@ -156,7 +160,7 @@ export async function getGoodsIssue(warehouse: string[] | null) {
     ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
-      : [])
+      : []),
   ])
 
   console.log('🚀 ~ getGoodsIssue ~ filters:', filters)

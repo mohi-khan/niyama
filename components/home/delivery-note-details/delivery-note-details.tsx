@@ -25,7 +25,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Printer } from 'lucide-react'
+import {
+  Printer,
+  Truck,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Clock,
+  Building2,
+  Warehouse,
+  Package,
+  Weight,
+  Box,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react'
 
 const DeliveryNoteDetails = () => {
   const name = useParams().name
@@ -34,10 +49,6 @@ const DeliveryNoteDetails = () => {
 
   const { data: deliveryNoteDetails, isLoading } = useGetDeliveryNoteDetails(
     name as string
-  )
-  console.log(
-    '🚀 ~ DeliveryNoteDetails ~ deliveryNoteDetails:',
-    deliveryNoteDetails
   )
 
   const noteData = deliveryNoteDetails?.data?.data
@@ -67,9 +78,12 @@ const DeliveryNoteDetails = () => {
   if (!noteData) {
     return (
       <div className="p-6">
-        <p className="text-center text-muted-foreground">
-          No delivery note details found.
-        </p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <AlertCircle className="h-16 w-16 text-gray-300 mb-4" />
+          <p className="text-center text-gray-500 font-medium">
+            No delivery note details found.
+          </p>
+        </div>
       </div>
     )
   }
@@ -86,21 +100,52 @@ const DeliveryNoteDetails = () => {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{noteData.name}</h1>
-          <p className="text-muted-foreground">{noteData.title}</p>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 pb-4 border-b">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-[#42af4b] rounded-lg">
+            <Truck className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {noteData.name}
+            </h1>
+            <p className="text-gray-600 mt-1">{noteData.title}</p>
+            <div className="flex items-center gap-2 mt-2">
+              {isDelivered ? (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Delivered
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                  <Clock className="h-3 w-3" />
+                  Pending
+                </span>
+              )}
+            </div>
+          </div>
         </div>
         <Button
-          variant={'outline'}
+          className={`${isDelivered ? 'bg-gray-400' : 'bg-[#42af4b] hover:bg-[#3ba844]'} text-white`}
           onClick={() => setIsAlertOpen(true)}
           disabled={isDelivered || deliverMutation.isPending}
         >
-          {deliverMutation.isPending
-            ? 'Delivering...'
-            : isDelivered
-              ? 'Delivered'
-              : 'Deliver'}
+          {deliverMutation.isPending ? (
+            <>
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Delivering...
+            </>
+          ) : isDelivered ? (
+            <>
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Delivered
+            </>
+          ) : (
+            <>
+              <Truck className="mr-2 h-4 w-4" />
+              Deliver
+            </>
+          )}
         </Button>
       </div>
 
@@ -108,16 +153,22 @@ const DeliveryNoteDetails = () => {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent className="bg-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Delivery</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Truck className="h-5 w-5 text-[#42af4b]" />
+              Confirm Delivery
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to deliver this note? This action cannot be
-              undone.
+              Are you sure you want to mark this delivery note as delivered?
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeliver}>
-              Confirm
+            <AlertDialogAction
+              onClick={handleDeliver}
+              className="bg-[#42af4b] hover:bg-[#3ba844]"
+            >
+              Confirm Delivery
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -125,179 +176,264 @@ const DeliveryNoteDetails = () => {
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <User className="h-4 w-4 text-[#42af4b]" />
               Customer Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3 pt-4">
             <div>
-              <p className="text-sm text-muted-foreground">Customer</p>
-              <p className="font-semibold">{noteData.customer}</p>
+              <p className="text-xs text-gray-500 mb-1">Customer ID</p>
+              <p className="font-semibold text-gray-900">{noteData.customer}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Customer Name</p>
-              <p className="font-semibold">{noteData.customer_name}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Contact Mobile</p>
-              <p className="font-semibold">
-                {noteData.contact_mobile || 'N/A'}
+              <p className="text-xs text-gray-500 mb-1">Customer Name</p>
+              <p className="font-semibold text-gray-900">
+                {noteData.customer_name}
               </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Contact Mobile</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.contact_mobile || 'N/A'}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Mail className="h-4 w-4 text-[#42af4b]" />
               Contact Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-3 pt-4">
             <div>
-              <p className="text-sm text-muted-foreground">Contact Person</p>
-              <p className="font-semibold">
+              <p className="text-xs text-gray-500 mb-1">Contact Person</p>
+              <p className="font-semibold text-gray-900">
                 {noteData.contact_person || 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Contact Display</p>
-              <p className="font-semibold">
+              <p className="text-xs text-gray-500 mb-1">Contact Display</p>
+              <p className="font-semibold text-gray-900">
                 {noteData.contact_display || 'N/A'}
               </p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Contact Email</p>
-              <p className="font-semibold">{noteData.contact_email || 'N/A'}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Email</p>
+                <p className="font-semibold text-gray-900 text-sm break-all">
+                  {noteData.contact_email || 'N/A'}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-[#42af4b]" />
               Posting Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Posting Date</p>
-              <p className="font-semibold">{noteData.posting_date}</p>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Posting Date</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.posting_date}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Posting Time</p>
-              <p className="font-semibold">{noteData.posting_time}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Posting Time</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.posting_time}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Owner</p>
-              <p className="font-semibold">{noteData.owner}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Owner</p>
+                <p className="font-semibold text-gray-900">{noteData.owner}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-[#42af4b]" />
               Company & Warehouse
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Company</p>
-              <p className="font-semibold">{noteData.company}</p>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Company</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.company}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Warehouse</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.set_warehouse}
+                </p>
+              </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Warehouse</p>
-              <p className="font-semibold">{noteData.set_warehouse}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Cost Center</p>
-              <p className="font-semibold">{noteData.cost_center || 'N/A'}</p>
+              <p className="text-xs text-gray-500 mb-1">Cost Center</p>
+              <p className="font-semibold text-gray-900">
+                {noteData.cost_center || 'N/A'}
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-xl font-semibold border-b pb-1 text-muted-foreground">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="pb-3 bg-gray-50 border-b">
+            <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+              <Package className="h-4 w-4 text-[#42af4b]" />
               Totals
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Quantity</p>
-              <p className="font-semibold">{noteData.total_qty}</p>
+          <CardContent className="space-y-3 pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Total Quantity</p>
+                <p className="font-semibold text-gray-900 text-lg">
+                  {noteData.total_qty}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Net Weight</p>
-              <p className="font-semibold">{noteData.total_net_weight}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Total Net Weight</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.total_net_weight}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Total Carton Quantity
-              </p>
-              <p className="font-semibold">
-                {noteData.custom_total_cartoon_quantity}
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500 mb-1">Total Carton Qty</p>
+                <p className="font-semibold text-gray-900">
+                  {noteData.custom_total_cartoon_quantity}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Items Table */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Items</h2>
-          <div>
-            <Printer
-              className="border p-2 w-10 h-10 rounded-md cursor-pointer hover:bg-gray-100 transition-colors"
-              onClick={() => handlePrint()}
-            />
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-[#42af4b]" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Items ({noteData.items.length})
+            </h2>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePrint()}
+            className="flex items-center gap-2 hover:bg-gray-100"
+          >
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
         </div>
-        <div className="border rounded-md overflow-x-auto">
+
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">SL</TableHead>
-                <TableHead>Item Code</TableHead>
-                <TableHead>Item Name</TableHead>
-                <TableHead>Item Group</TableHead>
-                <TableHead>Qty</TableHead>
-                <TableHead>Carton Qty</TableHead>
-                <TableHead>Stock Qty</TableHead>
-                <TableHead>Warehouse</TableHead>
-                <TableHead>Description</TableHead>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="w-16 font-semibold text-gray-900">
+                  SL
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Item Code
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Item Name
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Item Group
+                </TableHead>
+                <TableHead className="text-right font-semibold text-gray-900">
+                  Qty
+                </TableHead>
+                <TableHead className="text-right font-semibold text-gray-900">
+                  Carton Qty
+                </TableHead>
+                <TableHead className="text-right font-semibold text-gray-900">
+                  Stock Qty
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Warehouse
+                </TableHead>
+                <TableHead className="font-semibold text-gray-900">
+                  Description
+                </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {/* No data */}
               {noteData.items.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={9}
-                    className="text-center text-muted-foreground"
-                  >
-                    No items found.
+                <TableRow className="hover:bg-gray-50">
+                  <TableCell colSpan={9} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-2 text-gray-500">
+                      <Package className="h-12 w-12 text-gray-300" />
+                      <p className="font-medium">No items found</p>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
 
-              {/* Data rows */}
               {noteData.items.map((item, index) => (
-                <TableRow key={item.name ?? index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{item.item_code}</TableCell>
-                  <TableCell>{item.item_name}</TableCell>
-                  <TableCell>{item.item_group}</TableCell>
-                  <TableCell>{item.qty}</TableCell>
-                  <TableCell>{item.custom_carton_qty}</TableCell>
-                  <TableCell>{item.stock_qty}</TableCell>
-                  <TableCell>{item.warehouse}</TableCell>
-                  <TableCell>{item.description || 'N/A'}</TableCell>
+                <TableRow
+                  key={item.name ?? index}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell className="font-medium text-gray-700">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="font-semibold text-gray-900">
+                    {item.item_code}
+                  </TableCell>
+                  <TableCell className="text-gray-700">
+                    {item.item_name}
+                  </TableCell>
+                  <TableCell className="text-gray-700">
+                    {item.item_group}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {item.qty}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.custom_carton_qty}
+                  </TableCell>
+                  <TableCell className="text-right">{item.stock_qty}</TableCell>
+                  <TableCell className="text-gray-700">
+                    {item.warehouse}
+                  </TableCell>
+                  <TableCell className="text-gray-600 text-sm">
+                    {item.description || 'N/A'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -308,14 +444,12 @@ const DeliveryNoteDetails = () => {
       {/* Printable Delivery Note (Hidden from view) */}
       <div className="hidden">
         <div ref={printRef} className="p-8 bg-white">
-          {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 py-2">
               Delivery Note
             </h2>
           </div>
 
-          {/* Customer and Date Info */}
           <div className="flex justify-between mb-6 text-sm">
             <div>
               <p className="mb-1">
@@ -341,7 +475,6 @@ const DeliveryNoteDetails = () => {
             </div>
           </div>
 
-          {/* Table */}
           <table className="w-full border-collapse border border-gray-300 mb-4">
             <thead>
               <tr className="bg-gray-50">
@@ -399,13 +532,11 @@ const DeliveryNoteDetails = () => {
             </tbody>
           </table>
 
-          {/* Note */}
           <p className="text-sm mb-8">
             <span className="font-semibold">Note:</span>{' '}
             {noteData.custom_special_instruction || 'N/A'}
           </p>
 
-          {/* Signature Section */}
           <div className="flex justify-between pt-12">
             <div className="text-center">
               <div className="border-t border-gray-400 pt-2 w-40">
