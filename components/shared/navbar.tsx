@@ -168,7 +168,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-16">
             {/* Mobile Hamburger Menu Button */}
             <button
-              className="md:hidden flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -176,7 +176,7 @@ const Navbar = () => {
             </button>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden lg:flex items-center space-x-2">
               {navLinks.map((link) => {
                 const Icon = link.icon
                 return (
@@ -241,7 +241,7 @@ const Navbar = () => {
 
       {/* Mobile Slide-out Menu */}
       <div
-        className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ${
           isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
