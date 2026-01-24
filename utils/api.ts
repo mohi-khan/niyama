@@ -12,10 +12,35 @@ import {
   UserWarehousePermissionType,
 } from '@/utils/type'
 
-const API_KEY_AND_SECRET =
-  process.env.NEXT_PUBLIC_ADMINISTRATOR_API_KEY_AND_SECRET ||
-  process.env.NEXT_PUBLIC_CHKWAREHOUSE_API_KEY_AND_SECRET ||
-  process.env.NEXT_PUBLIC_DHKWAREHOUSE_API_KEY_AND_SECRET
+const userStr = localStorage.getItem('user')
+
+let API_KEY_AND_SECRET: string | undefined
+
+if (userStr) {
+  const rawKeys = process.env.NEXT_PUBLIC_WAREHOUSE_KEYS
+
+  if (!rawKeys) {
+    throw new Error('NEXT_PUBLIC_WAREHOUSE_KEYS is missing')
+  }
+
+  let warehouseKeys: { name: string; key: string }[] = []
+
+  try {
+    warehouseKeys = JSON.parse(rawKeys)
+  } catch (err) {
+    console.error('Invalid JSON in NEXT_PUBLIC_WAREHOUSE_KEYS')
+    // return
+  }
+
+  const matched = warehouseKeys.find((w) => w.name === userStr)
+
+  if (!matched) {
+    console.warn('No API key found for:', userStr)
+  } else {
+    API_KEY_AND_SECRET = matched.key
+    console.log(`${matched.name} user detected`)
+  }
+}
 
 export async function signIn(credentials: SignInRequest) {
   return fetchApi<SignInResponse>({
@@ -27,6 +52,8 @@ export async function signIn(credentials: SignInRequest) {
 }
 
 export async function getUserDetAssWarehouse() {
+  const rawKeys = process.env.NEXT_PUBLIC_WAREHOUSE_KEYS
+  console.log('🚀 ~ getUserDetAssWarehouse ~ rawKeys:', rawKeys)
   return fetchApi<any>({
     url: `api/method/frappe.auth.get_logged_user`,
     method: 'GET',
