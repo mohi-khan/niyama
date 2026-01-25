@@ -66,9 +66,6 @@ export default function Home() {
 
         let warehouse = usrPermissions?.data?.data
         if (!warehouse) {
-          alert(
-            'Login successful, but no Warehouse is assigned to your user account in ERPNext.'
-          )
           toast({
             title: 'Error',
             variant: 'destructive',
