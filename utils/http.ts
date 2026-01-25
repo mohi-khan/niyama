@@ -29,8 +29,8 @@ export async function fetchApi<T>({
   headers = {},
   schema,
 }: FetchOptions<T>): Promise<ApiResponse<T>> {
-  console.log(`${API_BASE_URL}/${url}`)
-  console.log(JSON.stringify(body))
+  //console.log(`${API_BASE_URL}/${url}`)
+  //console.log(JSON.stringify(body))
 
   const response = await fetch(`${API_BASE_URL}/${url}`, {
     method,
@@ -65,7 +65,7 @@ export async function fetchApi<T>({
     }
   }
 
-  console.log(response)
+  //console.log(response)
 
   // Parse JSON response
   const jsonData = await response.json().catch(() => null)
@@ -81,7 +81,7 @@ export async function fetchApi<T>({
 
   // Validate response with schema if provided
   if (schema) {
-    console.log(jsonData)
+    //console.log(jsonData)
     const result = schema.safeParse(jsonData)
     if (!result.success) {
       return {

@@ -27,7 +27,7 @@ const GoodsReceived = () => {
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
   const { data: goodsReceived } = useGetGoodsReceived(warehouse)
-  console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
+  //console.log('🚀 ~ GoodsReceived ~ goodsReceived:', goodsReceived?.data?.data)
 
   const materialReceivedData =
     goodsReceived?.data?.data?.filter(
