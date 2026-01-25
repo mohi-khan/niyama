@@ -66,7 +66,7 @@ export async function getDeliveryNote(warehouse: string[] | null) {
 }
 
 export async function deliverNote(name: string) {
-  const adminApiKey = getAdminApiKey()
+  const apiKey = resolveApiKey()
   return fetchApi({
     url: `api/resource/Delivery Note/${name}`,
     method: 'PUT',
@@ -74,7 +74,7 @@ export async function deliverNote(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: adminApiKey || '',
+      Authorization: apiKey || '',
     },
   })
 }
@@ -200,7 +200,7 @@ export async function issueGoods(name: string) {
 }
 
 export async function receiveGoods(name: string) {
-  const adminApiKey = getAdminApiKey()
+  const apiKey = resolveApiKey()
   return fetchApi({
     url: `api/resource/Stock Entry/${name}`,
     method: 'PUT',
@@ -208,7 +208,7 @@ export async function receiveGoods(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: adminApiKey || '',
+      Authorization: apiKey || '',
     },
   })
 }
