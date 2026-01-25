@@ -27,7 +27,7 @@ const DeliveryNotes = () => {
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
   const { data: deliveryNotes } = useGetDeliveryNote(warehouse)
-  console.log('🚀 ~ DeliveryNotes ~ deliveryNotes:', deliveryNotes)
+  //console.log('🚀 ~ DeliveryNotes ~ deliveryNotes:', deliveryNotes)
 
   const deliveryNoteList = deliveryNotes?.data?.data ?? []
 

@@ -16,8 +16,15 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { EyeIcon, EyeOffIcon, LockIcon, LogIn, User2, AlertCircle } from 'lucide-react'
-import { getUserDetAssWarehouse, getUserPermission, signIn } from '@/utils/api'
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LockIcon,
+  LogIn,
+  User2,
+  AlertCircle,
+} from 'lucide-react'
+import { getUserPermission, signIn } from '@/utils/api'
 import { toast } from '@/hooks/use-toast'
 
 export default function Home() {
@@ -41,23 +48,20 @@ export default function Home() {
 
     try {
       const loginResponse = await signIn({ usr: usr, pwd: pwd })
-      console.log('🚀 ~ handleSubmit ~ loginResponse:', loginResponse)
+      //console.log('🚀 ~ handleSubmit ~ loginResponse:', loginResponse)
       if (loginResponse.error || !loginResponse.data) {
         toast({
           title: 'Error',
           description: loginResponse.error?.message || 'Failed to signin',
         })
       } else {
-        router.push('/item-view')
+         router.push('/item-view')
         toast({
           title: 'Success',
           description: 'You are signed in',
         })
         localStorage.setItem('user', usr)
-        const response = await getUserDetAssWarehouse()
-        console.log('🚀 ~ handleSubmit ~ response:', response)
-
-        let apiKey = response.data.message
+        
         const usrPermissions = await getUserPermission(usr)
         console.log(
           '🚀 ~ handleSubmit ~ usrPermissions(warehouse):',
@@ -65,16 +69,18 @@ export default function Home() {
         )
 
         let warehouse = usrPermissions?.data?.data
+        localStorage.setItem('warehouse', JSON.stringify(warehouse))
+        console.log('🚀 ~ handleSubmit ~ warehouse:', warehouse)
+        //localStorage.setItem('apiKey', apiKey)
         if (!warehouse) {
           toast({
             title: 'Error',
             variant: 'destructive',
-            description: 'Login successful, but no Warehouse is assigned to your user account in ERPNext.',
+            description:
+              'Login successful, but no Warehouse is assigned to your user account in ERPNext.',
           })
           return
         }
-        localStorage.setItem('apiKey', apiKey)
-        localStorage.setItem('warehouse', JSON.stringify(warehouse))
       }
     } catch (err) {
       console.error('Login error:', err)
@@ -89,13 +95,13 @@ export default function Home() {
       <Card className="w-full max-w-sm bg-white shadow-xl border-0">
         <CardHeader className="space-y-4 pb-8">
           <div className="flex justify-center">
-              <Image
-                src="/logo.png"
-                alt="Company Logo"
-                width={120}
-                height={120}
-                className="rounded-lg"
-              />
+            <Image
+              src="/logo.png"
+              alt="Company Logo"
+              width={120}
+              height={120}
+              className="rounded-lg"
+            />
           </div>
           <div className="text-center">
             {/* <CardTitle className="text-2xl font-bold text-gray-900">
@@ -109,7 +115,10 @@ export default function Home() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="usr" className="flex items-center text-gray-700 font-medium">
+              <Label
+                htmlFor="usr"
+                className="flex items-center text-gray-700 font-medium"
+              >
                 <User2 className="w-4 h-4 mr-2 text-[#42af4b]" />
                 <span>Username / Email</span>
               </Label>
@@ -124,7 +133,10 @@ export default function Home() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pwd" className="flex items-center text-gray-700 font-medium">
+              <Label
+                htmlFor="pwd"
+                className="flex items-center text-gray-700 font-medium"
+              >
                 <LockIcon className="w-4 h-4 mr-2 text-[#42af4b]" />
                 <span>Password</span>
               </Label>

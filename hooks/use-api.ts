@@ -57,7 +57,7 @@ export const useDeliverNote = ({
     mutationFn: async ({ name }: { name: string }) => {
       const response = await deliverNote(name)
 
-      console.log('🚀 ~ useDeliverNote ~ response:', response)
+      //console.log('🚀 ~ useDeliverNote ~ response:', response)
 
       /**
        * 🔴 API-level error
@@ -79,7 +79,7 @@ export const useDeliverNote = ({
 
       const docstatus = doc?.docstatus
 
-      console.log('✅ docstatus:', docstatus)
+      //console.log('✅ docstatus:', docstatus)
 
       /**
        * 🔴 Logical failure (not actually submitted)
@@ -163,7 +163,7 @@ export const useDeliverNote = ({
 }
 
 export const useGetDeliveryNote = (warehouse: string[] | null) => {
-  console.log('🚀 ~ useGetDeliveryNote ~ warehouse:', warehouse)
+  //console.log('🚀 ~ useGetDeliveryNote ~ warehouse:', warehouse)
   return useQuery({
     queryKey: ['deliveryNotes', warehouse],
     queryFn: () => {
@@ -195,7 +195,7 @@ export const useGetGoodsIssueDetails = (name: string) => {
 }
 
 export const useGetGoodsReceived = (warehouse: string[] | null) => {
-  console.log('🚀 ~ useGetGoodsReceived ~ warehouse:', warehouse)
+  //console.log('🚀 ~ useGetGoodsReceived ~ warehouse:', warehouse)
   return useQuery({
     queryKey: ['goodsReceived', warehouse],
     queryFn: () => {
@@ -228,7 +228,7 @@ export const useIssueGoods = ({
     mutationFn: async ({ name }: { name: string }) => {
       const response = await issueGoods(name)
 
-      console.log('🚀 ~ useDeliverNote ~ response:', response)
+      //console.log('🚀 ~ useDeliverNote ~ response:', response)
 
       /**
        * 🔴 API-level error
@@ -250,7 +250,7 @@ export const useIssueGoods = ({
 
       const docstatus = doc?.docstatus
 
-      console.log('✅ docstatus:', docstatus)
+      //console.log('✅ docstatus:', docstatus)
 
       /**
        * 🔴 Logical failure (not actually submitted)
@@ -346,7 +346,7 @@ export const useReceiveGoods = ({
     mutationFn: async ({ name }: { name: string }) => {
       const response = await issueGoods(name)
 
-      console.log('🚀 ~ useDeliverNote ~ response:', response)
+      //console.log('🚀 ~ useDeliverNote ~ response:', response)
 
       /**
        * 🔴 API-level error
@@ -368,7 +368,7 @@ export const useReceiveGoods = ({
 
       const docstatus = doc?.docstatus
 
-      console.log('✅ docstatus:', docstatus)
+      //console.log('✅ docstatus:', docstatus)
 
       /**
        * 🔴 Logical failure (not actually submitted)

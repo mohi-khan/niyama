@@ -11,7 +11,7 @@ import {
   SignInResponseSchema,
   UserWarehousePermissionType,
 } from '@/utils/type'
-import { resolveApiKey } from './api-key'
+import { getAdminApiKey, resolveApiKey } from './api-key'
 
 export async function signIn(credentials: SignInRequest) {
   return fetchApi<SignInResponse>({
@@ -22,19 +22,9 @@ export async function signIn(credentials: SignInRequest) {
   })
 }
 
-export async function getUserDetAssWarehouse() {
-  const apiKey = resolveApiKey()
-  return fetchApi<any>({
-    url: `api/method/frappe.auth.get_logged_user`,
-    method: 'GET',
-    headers: {
-      Authorization: apiKey || '',
-    },
-  })
-}
-
 export async function getUserPermission(username: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
+  console.log("🚀 ~ getUserPermission ~ adminApiKey:", adminApiKey)
   const filters = JSON.stringify([
     ['user', '=', username],
     ['allow', '=', 'Warehouse'],
@@ -44,21 +34,21 @@ export async function getUserPermission(username: string) {
     url: `api/resource/User Permission?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getDeliveryNote(warehouse: string[] | null) {
-  const apiKey = resolveApiKey()
-  console.log('🚀 ~ getDeliveryNote ~ warehouse:', warehouse)
+  const adminApiKey = getAdminApiKey()
+  //console.log('🚀 ~ getDeliveryNote ~ warehouse:', warehouse)
   const filters = JSON.stringify([
-    ['docstatus', '=', 0],
+    ['docstatus', '=', 1],
     ...(warehouse && warehouse.length > 0
       ? [['set_warehouse', 'in', warehouse]]
       : []),
   ])
-  console.log('🚀 ~ getDeliveryNote ~ filters:', filters)
+  //console.log('🚀 ~ getDeliveryNote ~ filters:', filters)
   const fields = JSON.stringify([
     'name',
     'customer',
@@ -70,13 +60,13 @@ export async function getDeliveryNote(warehouse: string[] | null) {
     url: `api/resource/Delivery Note?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function deliverNote(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi({
     url: `api/resource/Delivery Note/${name}`,
     method: 'PUT',
@@ -84,57 +74,57 @@ export async function deliverNote(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getDeliveryNoteDetails(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi<DeliveryNoteDetailsType>({
     url: `api/resource/Delivery Note/${name}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getItems() {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi<GetItemType>({
     url: 'api/method/getItems',
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getStockLevelItem(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi<getStockLevelItemType>({
     url: `api/method/getStockLevelItem?item_code=${name}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getGoodsReceived(warehouse: string[] | null) {
-  const apiKey = resolveApiKey()
-  console.log('🚀 ~ getGoodsReceived ~ warehouse:', warehouse)
+  const adminApiKey = getAdminApiKey()
+  //console.log('🚀 ~ getGoodsReceived ~ warehouse:', warehouse)
 
   const filters = JSON.stringify([
-    ['docstatus', '=', 0],
+    ['docstatus', '=', 1],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
       : []),
     ['add_to_transit', '=', 0],
   ])
 
-  console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
+  //console.log('🚀 ~ getGoodsReceived ~ filters:', filters)
 
   const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
 
@@ -144,32 +134,32 @@ export async function getGoodsReceived(warehouse: string[] | null) {
     )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getGoodsReceivedDetails(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi<GoodsReceivedDetailsType>({
     url: `api/resource/Stock Entry/${name}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getGoodsIssue(warehouse: string[] | null) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   const filters = JSON.stringify([
-    ['docstatus', '=', 0],
+    ['docstatus', '=', 1],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
       : []),
   ])
 
-  console.log('🚀 ~ getGoodsIssue ~ filters:', filters)
+  //console.log('🚀 ~ getGoodsIssue ~ filters:', filters)
 
   const fields = JSON.stringify(['name', 'stock_entry_type', 'posting_date'])
 
@@ -179,18 +169,18 @@ export async function getGoodsIssue(warehouse: string[] | null) {
     )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
 
 export async function getGoodsIssueDetails(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi<GoodsReceivedDetailsType>({
     url: `api/resource/Stock Entry/${name}`,
     method: 'GET',
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }
@@ -210,7 +200,7 @@ export async function issueGoods(name: string) {
 }
 
 export async function receiveGoods(name: string) {
-  const apiKey = resolveApiKey()
+  const adminApiKey = getAdminApiKey()
   return fetchApi({
     url: `api/resource/Stock Entry/${name}`,
     method: 'PUT',
@@ -218,7 +208,7 @@ export async function receiveGoods(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: apiKey || '',
+      Authorization: adminApiKey || '',
     },
   })
 }

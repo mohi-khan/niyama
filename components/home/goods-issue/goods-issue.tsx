@@ -27,7 +27,7 @@ const GoodsIssue = () => {
     (warehousePermission as any)?.map((w: any) => w.for_value) ?? null
 
   const { data: goodsIssue } = useGetGoodsIssue(warehouse)
-  console.log('🚀 ~ GoodsIssue ~ goodsIssue:', goodsIssue?.data?.data)
+  //console.log('🚀 ~ GoodsIssue ~ goodsIssue:', goodsIssue?.data?.data)
 
   const goodsIssueList = goodsIssue?.data?.data ?? []
 
