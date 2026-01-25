@@ -43,7 +43,7 @@ export async function getDeliveryNote(warehouse: string[] | null) {
   const adminApiKey = getAdminApiKey()
   //console.log('🚀 ~ getDeliveryNote ~ warehouse:', warehouse)
   const filters = JSON.stringify([
-    ['docstatus', '=', 1],
+    ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['set_warehouse', 'in', warehouse]]
       : []),
@@ -117,7 +117,7 @@ export async function getGoodsReceived(warehouse: string[] | null) {
   //console.log('🚀 ~ getGoodsReceived ~ warehouse:', warehouse)
 
   const filters = JSON.stringify([
-    ['docstatus', '=', 1],
+    ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 't_warehouse', 'in', warehouse]]
       : []),
@@ -153,7 +153,7 @@ export async function getGoodsReceivedDetails(name: string) {
 export async function getGoodsIssue(warehouse: string[] | null) {
   const adminApiKey = getAdminApiKey()
   const filters = JSON.stringify([
-    ['docstatus', '=', 1],
+    ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
       ? [['Stock Entry Detail', 's_warehouse', 'in', warehouse]]
       : []),
