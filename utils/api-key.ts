@@ -12,9 +12,14 @@ export const resolveApiKey = (): string | undefined => {
 
   try {
     const keys: WarehouseKey[] = JSON.parse(rawKeys)
-    return keys.find((k) => k.name === userStr)?.key
-  } catch {
-    console.error('Invalid NEXT_PUBLIC_WAREHOUSE_KEYS JSON')
+
+    const matchedUser = keys.find((k) => k.name === userStr)
+
+    console.log('Current user API key:', matchedUser)
+
+    return matchedUser?.key
+  } catch (error) {
+    console.error('Invalid NEXT_PUBLIC_WAREHOUSE_KEYS JSON', error)
     return undefined
   }
 }
