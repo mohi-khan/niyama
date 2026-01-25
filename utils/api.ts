@@ -11,36 +11,7 @@ import {
   SignInResponseSchema,
   UserWarehousePermissionType,
 } from '@/utils/type'
-
-const userStr = localStorage.getItem('user')
-
-let API_KEY_AND_SECRET: string | undefined
-
-if (userStr) {
-  const rawKeys = process.env.NEXT_PUBLIC_WAREHOUSE_KEYS
-
-  if (!rawKeys) {
-    throw new Error('NEXT_PUBLIC_WAREHOUSE_KEYS is missing')
-  }
-
-  let warehouseKeys: { name: string; key: string }[] = []
-
-  try {
-    warehouseKeys = JSON.parse(rawKeys)
-  } catch (err) {
-    console.error('Invalid JSON in NEXT_PUBLIC_WAREHOUSE_KEYS')
-    // return
-  }
-
-  const matched = warehouseKeys.find((w) => w.name === userStr)
-
-  if (!matched) {
-    console.warn('No API key found for:', userStr)
-  } else {
-    API_KEY_AND_SECRET = matched.key
-    console.log(`${matched.name} user detected`)
-  }
-}
+import { resolveApiKey } from './api-key'
 
 export async function signIn(credentials: SignInRequest) {
   return fetchApi<SignInResponse>({
@@ -52,18 +23,18 @@ export async function signIn(credentials: SignInRequest) {
 }
 
 export async function getUserDetAssWarehouse() {
-  const rawKeys = process.env.NEXT_PUBLIC_WAREHOUSE_KEYS
-  console.log('🚀 ~ getUserDetAssWarehouse ~ rawKeys:', rawKeys)
+  const apiKey = resolveApiKey()
   return fetchApi<any>({
     url: `api/method/frappe.auth.get_logged_user`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getUserPermission(username: string) {
+  const apiKey = resolveApiKey()
   const filters = JSON.stringify([
     ['user', '=', username],
     ['allow', '=', 'Warehouse'],
@@ -73,12 +44,13 @@ export async function getUserPermission(username: string) {
     url: `api/resource/User Permission?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getDeliveryNote(warehouse: string[] | null) {
+  const apiKey = resolveApiKey()
   console.log('🚀 ~ getDeliveryNote ~ warehouse:', warehouse)
   const filters = JSON.stringify([
     ['docstatus', '=', 0],
@@ -98,12 +70,13 @@ export async function getDeliveryNote(warehouse: string[] | null) {
     url: `api/resource/Delivery Note?filters=${encodeURIComponent(filters)}&fields=${encodeURIComponent(fields)}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function deliverNote(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi({
     url: `api/resource/Delivery Note/${name}`,
     method: 'PUT',
@@ -111,42 +84,46 @@ export async function deliverNote(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getDeliveryNoteDetails(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi<DeliveryNoteDetailsType>({
     url: `api/resource/Delivery Note/${name}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getItems() {
+  const apiKey = resolveApiKey()
   return fetchApi<GetItemType>({
     url: 'api/method/getItems',
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getStockLevelItem(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi<getStockLevelItemType>({
     url: `api/method/getStockLevelItem?item_code=${name}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getGoodsReceived(warehouse: string[] | null) {
+  const apiKey = resolveApiKey()
   console.log('🚀 ~ getGoodsReceived ~ warehouse:', warehouse)
 
   const filters = JSON.stringify([
@@ -167,22 +144,24 @@ export async function getGoodsReceived(warehouse: string[] | null) {
     )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getGoodsReceivedDetails(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi<GoodsReceivedDetailsType>({
     url: `api/resource/Stock Entry/${name}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getGoodsIssue(warehouse: string[] | null) {
+  const apiKey = resolveApiKey()
   const filters = JSON.stringify([
     ['docstatus', '=', 0],
     ...(warehouse && warehouse.length > 0
@@ -200,22 +179,24 @@ export async function getGoodsIssue(warehouse: string[] | null) {
     )}&fields=${encodeURIComponent(fields)}&group_by=name`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function getGoodsIssueDetails(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi<GoodsReceivedDetailsType>({
     url: `api/resource/Stock Entry/${name}`,
     method: 'GET',
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function issueGoods(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi({
     url: `api/resource/Stock Entry/${name}`,
     method: 'PUT',
@@ -223,12 +204,13 @@ export async function issueGoods(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
 
 export async function receiveGoods(name: string) {
+  const apiKey = resolveApiKey()
   return fetchApi({
     url: `api/resource/Stock Entry/${name}`,
     method: 'PUT',
@@ -236,7 +218,7 @@ export async function receiveGoods(name: string) {
       docstatus: 1,
     },
     headers: {
-      Authorization: API_KEY_AND_SECRET || '',
+      Authorization: apiKey || '',
     },
   })
 }
